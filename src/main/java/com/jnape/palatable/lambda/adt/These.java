@@ -3,6 +3,7 @@ package com.jnape.palatable.lambda.adt;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -32,10 +33,12 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
 
     /**
      * {@inheritDoc}
+     * @param lFn
+     * @param rFn
      */
     @Override
-    public final <C, D> These<C, D> biMap(Function<? super A, ? extends C> lFn,
-                                          Function<? super B, ? extends D> rFn) {
+    public final <C, D> These<C, D> biMap(Fn1<? super A, ? extends C> lFn,
+                                          Fn1<? super B, ? extends D> rFn) {
         return match(a -> a(lFn.apply(a)), b -> b(rFn.apply(b)), into((a, b) -> both(lFn.apply(a), rFn.apply(b))));
     }
 
@@ -68,19 +71,21 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
 
     /**
      * {@inheritDoc}
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final <Z> These<Z, B> biMapL(Function<? super A, ? extends Z> fn) {
+    public final <Z> These<Z, B> biMapL(Fn1<? super A, ? extends Z> fn) {
         return (These<Z, B>) Bifunctor.super.biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final <C> These<A, C> biMapR(Function<? super B, ? extends C> fn) {
+    public final <C> These<A, C> biMapR(Fn1<? super B, ? extends C> fn) {
         return (These<A, C>) Bifunctor.super.biMapR(fn);
     }
 

@@ -2,7 +2,6 @@ package com.jnape.palatable.lambda.adt;
 
 import com.jnape.palatable.lambda.adt.choice.Choice3;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
-import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.Peek;
@@ -214,28 +213,35 @@ public abstract class Either<L, R> implements
 
     /**
      * {@inheritDoc}
+     *
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final <L2> Either<L2, R> biMapL(Function<? super L, ? extends L2> fn) {
+    public final <L2> Either<L2, R> biMapL(Fn1<? super L, ? extends L2> fn) {
         return (Either<L2, R>) Bifunctor.super.biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final <R2> Either<L, R2> biMapR(Function<? super R, ? extends R2> fn) {
+    public final <R2> Either<L, R2> biMapR(Fn1<? super R, ? extends R2> fn) {
         return (Either<L, R2>) Bifunctor.super.biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @param leftFn
+     * @param rightFn
      */
     @Override
-    public final <L2, R2> Either<L2, R2> biMap(Function<? super L, ? extends L2> leftFn,
-                                               Function<? super R, ? extends R2> rightFn) {
+    public final <L2, R2> Either<L2, R2> biMap(Fn1<? super L, ? extends L2> leftFn,
+                                               Fn1<? super R, ? extends R2> rightFn) {
         return match(l -> left(leftFn.apply(l)), r -> right(rightFn.apply(r)));
     }
 
@@ -252,7 +258,7 @@ public abstract class Either<L, R> implements
      */
     @Override
     public final <R2> Either<L, R2> zip(Applicative<Function<? super R, ? extends R2>, Either<L, ?>> appFn) {
-        return appFn.<Either<L, Function<? super R, ? extends R2>>>coerce().flatMap(this::biMapR);
+        return Monad.super.zip(appFn).coerce();
     }
 
     /**

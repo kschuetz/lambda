@@ -1,5 +1,6 @@
 package testsupport.applicatives;
 
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,8 +18,8 @@ public final class InvocationRecordingBifunctor<A, B> implements Bifunctor<A, B,
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C, D> InvocationRecordingBifunctor<C, D> biMap(Function<? super A, ? extends C> lFn,
-                                                           Function<? super B, ? extends D> rFn) {
+    public <C, D> InvocationRecordingBifunctor<C, D> biMap(Fn1<? super A, ? extends C> lFn,
+                                                           Fn1<? super B, ? extends D> rFn) {
         leftFn.set(lFn);
         rightFn.set(rFn);
         return (InvocationRecordingBifunctor<C, D>) this;

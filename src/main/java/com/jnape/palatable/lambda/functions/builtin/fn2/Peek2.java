@@ -7,11 +7,10 @@ import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.BoundedBifunctor;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Given two {@link Consumer}s, "peek" at the values contained inside a {@link Bifunctor} via
- * {@link Bifunctor#biMap(Function, Function)}, applying the {@link Consumer}s to the contained values,
+ * {@link BoundedBifunctor#biMap(Fn1, Fn1)}, applying the {@link Consumer}s to the contained values,
  * if there are any.
  *
  * @param <A>   the bifunctor's first parameter type

@@ -2,6 +2,7 @@ package com.jnape.palatable.lambda.adt.hlist;
 
 import com.jnape.palatable.lambda.adt.hlist.HList.HCons;
 import com.jnape.palatable.lambda.adt.product.Product5;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -120,19 +121,19 @@ public class Tuple5<_1, _2, _3, _4, _5> extends HCons<_1, Tuple4<_2, _3, _4, _5>
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_4Prime> Tuple5<_1, _2, _3, _4Prime, _5> biMapL(Function<? super _4, ? extends _4Prime> fn) {
+    public <_4Prime> Tuple5<_1, _2, _3, _4Prime, _5> biMapL(Fn1<? super _4, ? extends _4Prime> fn) {
         return (Tuple5<_1, _2, _3, _4Prime, _5>) Bifunctor.super.biMapL(fn);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> biMapR(Function<? super _5, ? extends _5Prime> fn) {
+    public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> biMapR(Fn1<? super _5, ? extends _5Prime> fn) {
         return (Tuple5<_1, _2, _3, _4, _5Prime>) Bifunctor.super.biMapR(fn);
     }
 
     @Override
-    public <_4Prime, _5Prime> Tuple5<_1, _2, _3, _4Prime, _5Prime> biMap(Function<? super _4, ? extends _4Prime> lFn,
-                                                                         Function<? super _5, ? extends _5Prime> rFn) {
+    public <_4Prime, _5Prime> Tuple5<_1, _2, _3, _4Prime, _5Prime> biMap(Fn1<? super _4, ? extends _4Prime> lFn,
+                                                                         Fn1<? super _5, ? extends _5Prime> rFn) {
         return new Tuple5<>(_1(), tail().biMap(lFn, rFn));
     }
 
@@ -170,7 +171,6 @@ public class Tuple5<_1, _2, _3, _4, _5> extends HCons<_1, Tuple4<_2, _3, _4, _5>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <_5Prime, App extends Applicative<?, App>, TravB extends Traversable<_5Prime, Tuple5<_1, _2, _3, _4, ?>>,
             AppB extends Applicative<_5Prime, App>,
             AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super _5, ? extends AppB> fn,

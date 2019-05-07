@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct6;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct7;
 import com.jnape.palatable.lambda.adt.hlist.HList;
 import com.jnape.palatable.lambda.adt.hlist.Tuple7;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -82,28 +83,32 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
 
     /**
      * {@inheritDoc}
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <H> Choice7<A, B, C, D, E, H, G> biMapL(Function<? super F, ? extends H> fn) {
+    public <H> Choice7<A, B, C, D, E, H, G> biMapL(Fn1<? super F, ? extends H> fn) {
         return (Choice7<A, B, C, D, E, H, G>) Bifunctor.super.biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
+     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <H> Choice7<A, B, C, D, E, F, H> biMapR(Function<? super G, ? extends H> fn) {
+    public <H> Choice7<A, B, C, D, E, F, H> biMapR(Fn1<? super G, ? extends H> fn) {
         return (Choice7<A, B, C, D, E, F, H>) Bifunctor.super.biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
+     * @param lFn
+     * @param rFn
      */
     @Override
-    public <H, I> Choice7<A, B, C, D, E, H, I> biMap(Function<? super F, ? extends H> lFn,
-                                                     Function<? super G, ? extends I> rFn) {
+    public <H, I> Choice7<A, B, C, D, E, H, I> biMap(Fn1<? super F, ? extends H> lFn,
+                                                     Fn1<? super G, ? extends I> rFn) {
         return match(Choice7::a, Choice7::b, Choice7::c, Choice7::d, Choice7::e, f -> f(lFn.apply(f)), g -> g(rFn.apply(g)));
     }
 

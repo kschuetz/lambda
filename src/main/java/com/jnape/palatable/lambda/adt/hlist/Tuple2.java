@@ -2,6 +2,7 @@ package com.jnape.palatable.lambda.adt.hlist;
 
 import com.jnape.palatable.lambda.adt.hlist.HList.HCons;
 import com.jnape.palatable.lambda.adt.product.Product2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -83,19 +84,19 @@ public class Tuple2<_1, _2> extends HCons<_1, SingletonHList<_2>> implements
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_1Prime> Tuple2<_1Prime, _2> biMapL(Function<? super _1, ? extends _1Prime> fn) {
+    public <_1Prime> Tuple2<_1Prime, _2> biMapL(Fn1<? super _1, ? extends _1Prime> fn) {
         return (Tuple2<_1Prime, _2>) Bifunctor.super.biMapL(fn);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_2Prime> Tuple2<_1, _2Prime> biMapR(Function<? super _2, ? extends _2Prime> fn) {
+    public <_2Prime> Tuple2<_1, _2Prime> biMapR(Fn1<? super _2, ? extends _2Prime> fn) {
         return (Tuple2<_1, _2Prime>) Bifunctor.super.biMapR(fn);
     }
 
     @Override
-    public <_1Prime, _2Prime> Tuple2<_1Prime, _2Prime> biMap(Function<? super _1, ? extends _1Prime> lFn,
-                                                             Function<? super _2, ? extends _2Prime> rFn) {
+    public <_1Prime, _2Prime> Tuple2<_1Prime, _2Prime> biMap(Fn1<? super _1, ? extends _1Prime> lFn,
+                                                             Fn1<? super _2, ? extends _2Prime> rFn) {
         return new Tuple2<>(lFn.apply(_1()), tail().fmap(rFn));
     }
 
@@ -132,7 +133,6 @@ public class Tuple2<_1, _2> extends HCons<_1, SingletonHList<_2>> implements
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <_2Prime, App extends Applicative<?, App>, TravB extends Traversable<_2Prime, Tuple2<_1, ?>>,
             AppB extends Applicative<_2Prime, App>,
             AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super _2, ? extends AppB> fn,

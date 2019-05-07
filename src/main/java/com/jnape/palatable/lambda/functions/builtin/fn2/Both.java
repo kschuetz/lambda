@@ -25,7 +25,7 @@ public final class Both<A, B, C> implements Fn3<Function<? super A, ? extends B>
     public Tuple2<B, C> checkedApply(Function<? super A, ? extends B> f,
                                      Function<? super A, ? extends C> g,
                                      A a) {
-        return Tuple2.fill(a).biMap(f, g);
+        return Tuple2.fill(a).biMap(f::apply, g::apply);
     }
 
     @SuppressWarnings("unchecked")

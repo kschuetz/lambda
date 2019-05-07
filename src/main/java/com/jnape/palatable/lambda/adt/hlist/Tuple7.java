@@ -2,6 +2,7 @@ package com.jnape.palatable.lambda.adt.hlist;
 
 import com.jnape.palatable.lambda.adt.hlist.HList.HCons;
 import com.jnape.palatable.lambda.adt.product.Product7;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -158,20 +159,20 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_6Prime> Tuple7<_1, _2, _3, _4, _5, _6Prime, _7> biMapL(Function<? super _6, ? extends _6Prime> fn) {
+    public <_6Prime> Tuple7<_1, _2, _3, _4, _5, _6Prime, _7> biMapL(Fn1<? super _6, ? extends _6Prime> fn) {
         return (Tuple7<_1, _2, _3, _4, _5, _6Prime, _7>) Bifunctor.super.biMapL(fn);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> biMapR(Function<? super _7, ? extends _7Prime> fn) {
+    public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> biMapR(Fn1<? super _7, ? extends _7Prime> fn) {
         return (Tuple7<_1, _2, _3, _4, _5, _6, _7Prime>) Bifunctor.super.biMapR(fn);
     }
 
     @Override
     public <_6Prime, _7Prime> Tuple7<_1, _2, _3, _4, _5, _6Prime, _7Prime> biMap(
-            Function<? super _6, ? extends _6Prime> lFn,
-            Function<? super _7, ? extends _7Prime> rFn) {
+            Fn1<? super _6, ? extends _6Prime> lFn,
+            Fn1<? super _7, ? extends _7Prime> rFn) {
         return new Tuple7<>(_1(), tail().biMap(lFn, rFn));
     }
 
@@ -211,7 +212,6 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <_7Prime, App extends Applicative<?, App>,
             TravB extends Traversable<_7Prime, Tuple7<_1, _2, _3, _4, _5, _6, ?>>,
             AppB extends Applicative<_7Prime, App>,

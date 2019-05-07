@@ -1,6 +1,7 @@
 package com.jnape.palatable.lambda.functions.recursion;
 
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.monad.Monad;
@@ -30,19 +31,19 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C> RecursiveResult<C, B> biMapL(Function<? super A, ? extends C> fn) {
+    public <C> RecursiveResult<C, B> biMapL(Fn1<? super A, ? extends C> fn) {
         return (RecursiveResult<C, B>) Bifunctor.super.biMapL(fn);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <C> RecursiveResult<A, C> biMapR(Function<? super B, ? extends C> fn) {
+    public <C> RecursiveResult<A, C> biMapR(Fn1<? super B, ? extends C> fn) {
         return (RecursiveResult<A, C>) Bifunctor.super.biMapR(fn);
     }
 
     @Override
-    public <C, D> RecursiveResult<C, D> biMap(Function<? super A, ? extends C> lFn,
-                                              Function<? super B, ? extends D> rFn) {
+    public <C, D> RecursiveResult<C, D> biMap(Fn1<? super A, ? extends C> lFn,
+                                              Fn1<? super B, ? extends D> rFn) {
         return match(a -> recurse(lFn.apply(a)), b -> terminate(rFn.apply(b)));
     }
 
@@ -79,7 +80,6 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <C, App extends Applicative<?, App>, TravB extends Traversable<C, RecursiveResult<A, ?>>,
             AppB extends Applicative<C, App>,
             AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super B, ? extends AppB> fn,
