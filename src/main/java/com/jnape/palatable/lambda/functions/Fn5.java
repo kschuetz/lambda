@@ -5,7 +5,6 @@ import com.jnape.palatable.lambda.functions.specialized.checked.Runtime;
 import com.jnape.palatable.lambda.functor.Applicative;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static com.jnape.palatable.lambda.functions.Fn6.fn6;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
@@ -138,7 +137,7 @@ public interface Fn5<A, B, C, D, E, F> extends Fn4<A, B, C, D, Fn1<E, F>> {
     }
 
     @Override
-    default <Z> Fn5<Z, B, C, D, E, F> diMapL(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn5<Z, B, C, D, E, F> diMapL(Fn1<? super Z, ? extends A> fn) {
         return fn5(Fn4.super.diMapL(fn));
     }
 

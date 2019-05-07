@@ -5,7 +5,6 @@ import com.jnape.palatable.lambda.functions.specialized.checked.Runtime;
 import com.jnape.palatable.lambda.functor.Applicative;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * A function taking six arguments. Defined in terms of {@link Fn7}, so similarly auto-curried.
@@ -180,7 +179,7 @@ public interface Fn8<A, B, C, D, E, F, G, H, I> extends Fn7<A, B, C, D, E, F, G,
     }
 
     @Override
-    default <Z> Fn8<Z, B, C, D, E, F, G, H, I> diMapL(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn8<Z, B, C, D, E, F, G, H, I> diMapL(Fn1<? super Z, ? extends A> fn) {
         return fn8(Fn7.super.diMapL(fn));
     }
 

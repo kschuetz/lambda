@@ -31,7 +31,7 @@ public final class Market<A, B, S, T> implements
     private final Fn1<? super B, ? extends T>            bt;
     private final Fn1<? super S, ? extends Either<T, A>> sta;
 
-    public Market(Function<? super B, ? extends T> bt, Function<? super S, ? extends Either<T, A>> sta) {
+    public Market(Fn1<? super B, ? extends T> bt, Fn1<? super S, ? extends Either<T, A>> sta) {
         this.bt = fn1(bt);
         this.sta = fn1(sta);
     }
@@ -88,7 +88,7 @@ public final class Market<A, B, S, T> implements
      */
     @Override
     public <U> Market<A, B, S, U> fmap(Function<? super T, ? extends U> fn) {
-        return diMapR(fn);
+        return diMapR(fn::apply);
     }
 
     /**
@@ -105,8 +105,8 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <R, U> Market<A, B, R, U> diMap(Function<? super R, ? extends S> lFn,
-                                           Function<? super T, ? extends U> rFn) {
+    public <R, U> Market<A, B, R, U> diMap(Fn1<? super R, ? extends S> lFn,
+                                           Fn1<? super T, ? extends U> rFn) {
         return new Market<>(bt.fmap(rFn), sta.diMapL(lFn).diMapR(c -> c.biMapL(rFn)));
     }
 
@@ -114,7 +114,7 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <R> Market<A, B, R, T> diMapL(Function<? super R, ? extends S> fn) {
+    public <R> Market<A, B, R, T> diMapL(Fn1<? super R, ? extends S> fn) {
         return (Market<A, B, R, T>) Cocartesian.super.<R>diMapL(fn);
     }
 
@@ -122,7 +122,7 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <U> Market<A, B, S, U> diMapR(Function<? super T, ? extends U> fn) {
+    public <U> Market<A, B, S, U> diMapR(Fn1<? super T, ? extends U> fn) {
         return (Market<A, B, S, U>) Cocartesian.super.<U>diMapR(fn);
     }
 

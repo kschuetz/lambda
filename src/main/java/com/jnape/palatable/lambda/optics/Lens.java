@@ -197,7 +197,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <R> Lens<R, T, A, B> diMapL(Function<? super R, ? extends S> fn) {
+    default <R> Lens<R, T, A, B> diMapL(Fn1<? super R, ? extends S> fn) {
         return (Lens<R, T, A, B>) Profunctor.super.<R>diMapL(fn);
     }
 
@@ -205,7 +205,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Lens<S, U, A, B> diMapR(Function<? super T, ? extends U> fn) {
+    default <U> Lens<S, U, A, B> diMapR(Fn1<? super T, ? extends U> fn) {
         return (Lens<S, U, A, B>) Profunctor.super.<U>diMapR(fn);
     }
 
@@ -213,8 +213,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <R, U> Lens<R, U, A, B> diMap(Function<? super R, ? extends S> lFn,
-                                          Function<? super T, ? extends U> rFn) {
+    default <R, U> Lens<R, U, A, B> diMap(Fn1<? super R, ? extends S> lFn, Fn1<? super T, ? extends U> rFn) {
         return this.<R>mapS(lFn).mapT(rFn);
     }
 
@@ -230,7 +229,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <R> Lens<R, T, A, B> mapS(Function<? super R, ? extends S> fn) {
+    default <R> Lens<R, T, A, B> mapS(Fn1<? super R, ? extends S> fn) {
         return lens(Optic.super.mapS(fn));
     }
 
@@ -238,7 +237,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Lens<S, U, A, B> mapT(Function<? super T, ? extends U> fn) {
+    default <U> Lens<S, U, A, B> mapT(Fn1<? super T, ? extends U> fn) {
         return lens(Optic.super.mapT(fn));
     }
 
@@ -246,7 +245,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <C> Lens<S, T, C, B> mapA(Function<? super A, ? extends C> fn) {
+    default <C> Lens<S, T, C, B> mapA(Fn1<? super A, ? extends C> fn) {
         return lens(Optic.super.mapA(fn));
     }
 
@@ -254,7 +253,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <Z> Lens<S, T, A, Z> mapB(Function<? super Z, ? extends B> fn) {
+    default <Z> Lens<S, T, A, Z> mapB(Fn1<? super Z, ? extends B> fn) {
         return lens(Optic.super.mapB(fn));
     }
 

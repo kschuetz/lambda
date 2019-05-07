@@ -151,7 +151,7 @@ public interface Fn1<A, B> extends
      * @return an {@link Fn1}&lt;Z, B&gt;
      */
     @Override
-    default <Z> Fn1<Z, B> diMapL(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn1<Z, B> diMapL(Fn1<? super Z, ? extends A> fn) {
         return (Fn1<Z, B>) Cartesian.super.<Z>diMapL(fn);
     }
 
@@ -164,7 +164,7 @@ public interface Fn1<A, B> extends
      * @return an {@link Fn1}&lt;A, C&gt;
      */
     @Override
-    default <C> Fn1<A, C> diMapR(Function<? super B, ? extends C> fn) {
+    default <C> Fn1<A, C> diMapR(Fn1<? super B, ? extends C> fn) {
         return (Fn1<A, C>) Cartesian.super.<C>diMapR(fn);
     }
 
@@ -178,7 +178,7 @@ public interface Fn1<A, B> extends
      * @return an {@link Fn1}&lt;Z, C&gt;
      */
     @Override
-    default <Z, C> Fn1<Z, C> diMap(Function<? super Z, ? extends A> lFn, Function<? super B, ? extends C> rFn) {
+    default <Z, C> Fn1<Z, C> diMap(Fn1<? super Z, ? extends A> lFn, Fn1<? super B, ? extends C> rFn) {
         return lFn.andThen(this).andThen(rFn)::apply;
     }
 

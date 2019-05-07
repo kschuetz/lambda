@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 
-import java.util.function.Function;
-
 /**
  * A specialized {@link Fn2} that returns a Boolean when fully applied,
  * or a {@link Predicate} when partially applied.
@@ -52,7 +50,7 @@ public interface BiPredicate<A, B> extends Fn2<A, B, Boolean>, java.util.functio
      * {@inheritDoc}
      */
     @Override
-    default <Z> BiPredicate<Z, B> diMapL(Function<? super Z, ? extends A> fn) {
+    default <Z> BiPredicate<Z, B> diMapL(Fn1<? super Z, ? extends A> fn) {
         return Fn2.super.diMapL(fn)::apply;
     }
 

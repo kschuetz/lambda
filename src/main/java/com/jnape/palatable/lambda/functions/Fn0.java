@@ -76,7 +76,7 @@ public interface Fn0<A> extends Fn1<Unit, A>, Supplier<A>, Callable<A> {
     }
 
     @Override
-    default <B> Fn0<B> diMapR(Function<? super A, ? extends B> fn) {
+    default <B> Fn0<B> diMapR(Fn1<? super A, ? extends B> fn) {
         return Fn1.super.<B>diMapR(fn).thunk(UNIT);
     }
 

@@ -93,8 +93,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <Z, C> Tagged<Z, C> diMap(Function<? super Z, ? extends S> lFn,
-                                     Function<? super B, ? extends C> rFn) {
+    public <Z, C> Tagged<Z, C> diMap(Fn1<? super Z, ? extends S> lFn, Fn1<? super B, ? extends C> rFn) {
         return new Tagged<>(rFn.apply(b));
     }
 
@@ -102,7 +101,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <Z> Tagged<Z, B> diMapL(Function<? super Z, ? extends S> fn) {
+    public <Z> Tagged<Z, B> diMapL(Fn1<? super Z, ? extends S> fn) {
         return (Tagged<Z, B>) Cocartesian.super.<Z>diMapL(fn);
     }
 
@@ -110,7 +109,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <C> Tagged<S, C> diMapR(Function<? super B, ? extends C> fn) {
+    public <C> Tagged<S, C> diMapR(Fn1<? super B, ? extends C> fn) {
         return (Tagged<S, C>) Cocartesian.super.<C>diMapR(fn);
     }
 

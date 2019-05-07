@@ -43,7 +43,7 @@ public interface Effect<A> extends Fn1<A, IO<Unit>>, Consumer<A> {
     }
 
     @Override
-    default <Z> Effect<Z> diMapL(Function<? super Z, ? extends A> fn) {
+    default <Z> Effect<Z> diMapL(Fn1<? super Z, ? extends A> fn) {
         return effect(Fn1.super.diMapL(fn));
     }
 
