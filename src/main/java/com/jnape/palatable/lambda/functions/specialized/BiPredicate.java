@@ -1,6 +1,7 @@
 package com.jnape.palatable.lambda.functions.specialized;
 
 import com.jnape.palatable.lambda.adt.product.Product2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 
 import java.util.function.Function;
@@ -59,7 +60,7 @@ public interface BiPredicate<A, B> extends Fn2<A, B, Boolean>, java.util.functio
      * {@inheritDoc}
      */
     @Override
-    default <Z> Fn2<Z, B, Boolean> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn2<Z, B, Boolean> contraMap(Fn1<? super Z, ? extends A> fn) {
         return Fn2.super.contraMap(fn)::apply;
     }
 

@@ -1,6 +1,7 @@
 package com.jnape.palatable.lambda.functor;
 
 import com.jnape.palatable.lambda.adt.choice.Choice2;
+import com.jnape.palatable.lambda.functions.Fn1;
 
 import java.util.function.Function;
 
@@ -61,7 +62,7 @@ public interface Cocartesian<A, B, P extends Cocartesian<?, ?, P>> extends Profu
      * {@inheritDoc}
      */
     @Override
-    default <Z> Cocartesian<Z, B, P> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Cocartesian<Z, B, P> contraMap(Fn1<? super Z, ? extends A> fn) {
         return (Cocartesian<Z, B, P>) Profunctor.super.<Z>contraMap(fn);
     }
 }

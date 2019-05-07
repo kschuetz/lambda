@@ -1,6 +1,7 @@
 package com.jnape.palatable.lambda.functor.builtin;
 
 import com.jnape.palatable.lambda.adt.choice.Choice2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Cocartesian;
 import com.jnape.palatable.lambda.monad.Monad;
@@ -117,7 +118,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <Z> Tagged<Z, B> contraMap(Function<? super Z, ? extends S> fn) {
+    public <Z> Tagged<Z, B> contraMap(Fn1<? super Z, ? extends S> fn) {
         return (Tagged<Z, B>) Cocartesian.super.<Z>contraMap(fn);
     }
 }

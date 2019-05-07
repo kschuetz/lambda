@@ -222,7 +222,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <R> Lens<R, T, A, B> contraMap(Function<? super R, ? extends S> fn) {
+    default <R> Lens<R, T, A, B> contraMap(Fn1<? super R, ? extends S> fn) {
         return (Lens<R, T, A, B>) Profunctor.super.<R>contraMap(fn);
     }
 

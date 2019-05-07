@@ -177,7 +177,7 @@ public interface Fn7<A, B, C, D, E, F, G, H> extends Fn6<A, B, C, D, E, F, Fn1<G
     }
 
     @Override
-    default <Z> Fn7<Z, B, C, D, E, F, G, H> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn7<Z, B, C, D, E, F, G, H> contraMap(Fn1<? super Z, ? extends A> fn) {
         return fn7(Fn6.super.contraMap(fn));
     }
 

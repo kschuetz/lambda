@@ -44,7 +44,7 @@ public interface Predicate<A> extends Fn1<A, Boolean>, java.util.function.Predic
      * {@inheritDoc}
      */
     @Override
-    default <Z> Predicate<Z> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Predicate<Z> contraMap(Fn1<? super Z, ? extends A> fn) {
         return Fn1.super.contraMap(fn)::apply;
     }
 

@@ -63,7 +63,7 @@ public interface Kleisli<A, B, M extends Monad<?, M>, MB extends Monad<B, M>> ex
      * {@inheritDoc}
      */
     @Override
-    default <Z> Kleisli<Z, B, M, MB> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Kleisli<Z, B, M, MB> contraMap(Fn1<? super Z, ? extends A> fn) {
         return Fn1.super.contraMap(fn)::apply;
     }
 

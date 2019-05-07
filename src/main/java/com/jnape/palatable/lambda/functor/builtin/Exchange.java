@@ -1,5 +1,6 @@
 package com.jnape.palatable.lambda.functor.builtin;
 
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Profunctor;
 import com.jnape.palatable.lambda.optics.Iso;
 
@@ -69,7 +70,7 @@ public final class Exchange<A, B, S, T> implements Profunctor<S, T, Exchange<A, 
      * {@inheritDoc}
      */
     @Override
-    public <Z> Exchange<A, B, Z, T> contraMap(Function<? super Z, ? extends S> fn) {
+    public <Z> Exchange<A, B, Z, T> contraMap(Fn1<? super Z, ? extends S> fn) {
         return (Exchange<A, B, Z, T>) Profunctor.super.<Z>contraMap(fn);
     }
 }

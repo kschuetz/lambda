@@ -223,7 +223,7 @@ public interface Fn1<A, B> extends
     }
 
     @Override
-    default <Z> Fn1<Z, B> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn1<Z, B> contraMap(Fn1<? super Z, ? extends A> fn) {
         return (Fn1<Z, B>) Cartesian.super.<Z>contraMap(fn);
     }
 

@@ -178,7 +178,7 @@ public interface Iso<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <R> Iso<R, T, A, B> contraMap(Function<? super R, ? extends S> fn) {
+    default <R> Iso<R, T, A, B> contraMap(Fn1<? super R, ? extends S> fn) {
         return (Iso<R, T, A, B>) Profunctor.super.<R>contraMap(fn);
     }
 

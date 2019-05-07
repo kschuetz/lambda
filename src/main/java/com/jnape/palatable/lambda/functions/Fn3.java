@@ -111,7 +111,7 @@ public interface Fn3<A, B, C, D> extends Fn2<A, B, Fn1<C, D>> {
     }
 
     @Override
-    default <Z> Fn3<Z, B, C, D> contraMap(Function<? super Z, ? extends A> fn) {
+    default <Z> Fn3<Z, B, C, D> contraMap(Fn1<? super Z, ? extends A> fn) {
         return fn3(Fn2.super.contraMap(fn));
     }
 

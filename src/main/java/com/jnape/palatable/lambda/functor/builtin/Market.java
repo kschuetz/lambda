@@ -130,7 +130,7 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <R> Market<A, B, R, T> contraMap(Function<? super R, ? extends S> fn) {
+    public <R> Market<A, B, R, T> contraMap(Fn1<? super R, ? extends S> fn) {
         return (Market<A, B, R, T>) Cocartesian.super.<R>contraMap(fn);
     }
 }
