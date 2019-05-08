@@ -8,7 +8,6 @@ import com.jnape.palatable.lambda.traversable.LambdaMap;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 
@@ -77,27 +76,30 @@ public final class Sequence<A, App extends Applicative<?, App>, Trav extends Tra
     public static <A, App extends Applicative<?, App>, AppA extends Applicative<A, App>,
             AppIterable extends Applicative<Iterable<A>, App>,
             IterableApp extends Iterable<AppA>>
-    Fn1<Function<Iterable<A>, ? extends AppIterable>, AppIterable> sequence(IterableApp iterableApp) {
+    Fn1<Fn1<Iterable<A>, ? extends AppIterable>, AppIterable> sequence(IterableApp iterableApp) {
         return pure -> (AppIterable) Sequence.<A, App, LambdaIterable<?>, LambdaIterable<A>, AppA, Applicative<LambdaIterable<A>, App>, LambdaIterable<AppA>>sequence(
                 LambdaIterable.wrap(iterableApp), x -> pure.apply(x.unwrap()).fmap(LambdaIterable::wrap))
                 .fmap(LambdaIterable::unwrap);
     }
 
-    public static <A, App extends Applicative<?, App>, AppA extends Applicative<A, App>, AppIterable extends Applicative<Iterable<A>, App>, IterableApp extends Iterable<AppA>>
-    AppIterable sequence(IterableApp iterableApp, Function<Iterable<A>, ? extends AppIterable> pure) {
+    public static <A, App extends Applicative<?, App>, AppA extends Applicative<A, App>,
+            AppIterable extends Applicative<Iterable<A>, App>, IterableApp extends Iterable<AppA>>
+    AppIterable sequence(IterableApp iterableApp, Fn1<Iterable<A>, ? extends AppIterable> pure) {
         return Sequence.<A, App, AppA, AppIterable, IterableApp>sequence(iterableApp).apply(pure);
     }
 
     @SuppressWarnings({"unchecked", "RedundantTypeArguments"})
-    public static <A, B, App extends Applicative<?, App>, AppB extends Applicative<B, App>, AppMap extends Applicative<Map<A, B>, App>, MapApp extends Map<A, AppB>>
-    Fn1<Function<Map<A, B>, ? extends AppMap>, AppMap> sequence(MapApp mapApp) {
+    public static <A, B, App extends Applicative<?, App>, AppB extends Applicative<B, App>,
+            AppMap extends Applicative<Map<A, B>, App>, MapApp extends Map<A, AppB>>
+    Fn1<Fn1<Map<A, B>, ? extends AppMap>, AppMap> sequence(MapApp mapApp) {
         return pure -> (AppMap) Sequence.<B, App, LambdaMap<A, ?>, LambdaMap<A, B>, AppB, Applicative<LambdaMap<A, B>, App>, LambdaMap<A, AppB>>sequence(
                 LambdaMap.wrap(mapApp), x -> pure.apply(x.unwrap()).fmap(LambdaMap::wrap))
                 .fmap(LambdaMap::unwrap);
     }
 
-    public static <A, B, App extends Applicative<?, App>, AppB extends Applicative<B, App>, AppMap extends Applicative<Map<A, B>, App>, MapApp extends Map<A, AppB>>
-    AppMap sequence(MapApp mapApp, Function<Map<A, B>, ? extends AppMap> pure) {
+    public static <A, B, App extends Applicative<?, App>, AppB extends Applicative<B, App>,
+            AppMap extends Applicative<Map<A, B>, App>, MapApp extends Map<A, AppB>>
+    AppMap sequence(MapApp mapApp, Fn1<Map<A, B>, ? extends AppMap> pure) {
         return Sequence.<A, B, App, AppB, AppMap, MapApp>sequence(mapApp).apply(pure);
     }
 }

@@ -1,7 +1,6 @@
 package com.jnape.palatable.lambda.traversable;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Functor;
 
@@ -11,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
+import static com.jnape.palatable.lambda.functions.Fn2.fn2;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Map.map;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.ToMap.toMap;
@@ -50,11 +50,10 @@ public final class LambdaMap<A, B> implements Functor<B, LambdaMap<A, ?>>, Trave
             AppC extends Applicative<C, App>,
             AppTrav extends Applicative<TravC, App>> AppTrav traverse(Fn1<? super B, ? extends AppC> fn,
                                                                       Fn1<? super TravC, ? extends AppTrav> pure) {
-        return foldLeft(Fn2.<AppTrav, Map.Entry<A, AppC>, AppTrav>fn2(
-                appTrav -> into((k, appV) -> (AppTrav) appTrav.<TravC>zip(appV.fmap(v -> m -> {
-                    ((LambdaMap<A, C>) m).unwrap().put(k, v);
-                    return m;
-                })))).toBiFunction(),
+        return foldLeft(fn2(appTrav -> into((k, appV) -> (AppTrav) appTrav.<TravC>zip(appV.fmap(v -> m -> {
+                            ((LambdaMap<A, C>) m).unwrap().put(k, v);
+                            return m;
+                        })))),
                         pure.apply((TravC) LambdaMap.<A, C>wrap(new HashMap<>())),
                         this.<AppC>fmap(fn).unwrap().entrySet());
     }

@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
                          will simply bypass javac to throw checked exceptions as if they were unchecked. This allows all 
                          checked variants to be eliminated
 - ***Breaking Change***: All `Checked` variants have been eliminated
+- ***Breaking Change***: Eliminating extraneous `Partial2` and `Partial3` functions as `Fn2` has supplanted `BiFunction` 
 - `IO` is now stack-safe, regardless of whether the composition nests linearly or recursively
 
 ### Added

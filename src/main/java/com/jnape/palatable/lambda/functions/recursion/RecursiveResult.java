@@ -8,7 +8,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Specialized {@link CoProduct2} representing the possible results of a primitive recursive function.
@@ -102,7 +101,7 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn) {
             return aFn.apply(a);
         }
 
@@ -132,7 +131,7 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn) {
             return bFn.apply(b);
         }
 

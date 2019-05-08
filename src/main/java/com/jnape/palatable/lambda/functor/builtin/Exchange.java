@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Profunctor;
 import com.jnape.palatable.lambda.optics.Iso;
 
-import java.util.function.Function;
-
 /**
  * A profunctor used to extract the isomorphic functions an {@link Iso} is composed of.
  *
@@ -26,7 +24,7 @@ public final class Exchange<A, B, S, T> implements Profunctor<S, T, Exchange<A, 
     /**
      * Extract the mapping <code>S -&gt; A</code>.
      *
-     * @return a <code>{@link Function}&lt;S, A&gt;</code>
+     * @return an <code>{@link Fn1}&lt;S, A&gt;</code>
      */
     public Fn1<? super S, ? extends A> sa() {
         return sa;
@@ -35,7 +33,7 @@ public final class Exchange<A, B, S, T> implements Profunctor<S, T, Exchange<A, 
     /**
      * Extract the mapping <code>B -&gt; T</code>.
      *
-     * @return a <code>{@link Function}&lt;B, T&gt;</code>
+     * @return an <code>{@link Fn1}&lt;B, T&gt;</code>
      */
     public Fn1<? super B, ? extends T> bt() {
         return bt;
@@ -47,7 +45,7 @@ public final class Exchange<A, B, S, T> implements Profunctor<S, T, Exchange<A, 
     @Override
     public <Z, C> Exchange<A, B, Z, C> diMap(Fn1<? super Z, ? extends S> lFn,
                                              Fn1<? super T, ? extends C> rFn) {
-        return new Exchange<>(lFn.andThen(sa), bt.andThen(rFn));
+        return new Exchange<>(lFn.fmap(sa), bt.fmap(rFn));
     }
 
     /**

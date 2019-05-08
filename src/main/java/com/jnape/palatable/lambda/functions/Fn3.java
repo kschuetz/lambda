@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.functions.specialized.checked.Runtime;
 import com.jnape.palatable.lambda.functor.Applicative;
 
-import java.util.function.BiFunction;
-
 import static com.jnape.palatable.lambda.functions.Fn4.fn4;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 
@@ -112,11 +110,6 @@ public interface Fn3<A, B, C, D> extends Fn2<A, B, Fn1<C, D>> {
     @Override
     default <Z> Fn3<Z, B, C, D> contraMap(Fn1<? super Z, ? extends A> fn) {
         return fn3(Fn2.super.contraMap(fn));
-    }
-
-    @Override
-    default <Y, Z> Fn4<Y, Z, B, C, D> compose(BiFunction<? super Y, ? super Z, ? extends A> before) {
-        return fn4(Fn2.super.compose(before));
     }
 
     @Override

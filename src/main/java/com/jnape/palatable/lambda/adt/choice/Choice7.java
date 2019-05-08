@@ -13,7 +13,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into7.into7;
 import static com.jnape.palatable.lambda.functor.builtin.Lazy.lazy;
@@ -62,15 +61,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
      * {@inheritDoc}
      */
     @Override
-    public Choice6<A, B, C, D, E, F> converge(
-            Function<? super G, ? extends CoProduct6<A, B, C, D, E, F, ?>> convergenceFn) {
-        return match(Choice6::a,
-                     Choice6::b,
-                     Choice6::c,
-                     Choice6::d,
-                     Choice6::e,
-                     Choice6::f,
-                     convergenceFn.andThen(cp6 -> cp6.match(Choice6::a, Choice6::b, Choice6::c, Choice6::d, Choice6::e, Choice6::f)));
+    public Choice6<A, B, C, D, E, F> converge(Fn1<? super G, ? extends CoProduct6<A, B, C, D, E, F, ?>> convergenceFn) {
+        return match(Choice6::a, Choice6::b, Choice6::c, Choice6::d, Choice6::e, Choice6::f,
+                     convergenceFn.fmap(cp6 -> cp6.match(Choice6::a, Choice6::b, Choice6::c, Choice6::d, Choice6::e,
+                                                         Choice6::f)));
     }
 
     /**
@@ -310,10 +304,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return aFn.apply(a);
         }
 
@@ -343,10 +337,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return bFn.apply(b);
         }
 
@@ -376,10 +370,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return cFn.apply(c);
         }
 
@@ -409,10 +403,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return dFn.apply(d);
         }
 
@@ -442,10 +436,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return eFn.apply(e);
         }
 
@@ -475,10 +469,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return fFn.apply(f);
         }
 
@@ -508,10 +502,10 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn, Function<? super D, ? extends R> dFn,
-                           Function<? super E, ? extends R> eFn, Function<? super F, ? extends R> fFn,
-                           Function<? super G, ? extends R> gFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn, Fn1<? super D, ? extends R> dFn,
+                           Fn1<? super E, ? extends R> eFn, Fn1<? super F, ? extends R> fFn,
+                           Fn1<? super G, ? extends R> gFn) {
             return gFn.apply(g);
         }
 

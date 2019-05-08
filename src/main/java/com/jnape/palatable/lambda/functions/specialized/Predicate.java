@@ -2,8 +2,6 @@ package com.jnape.palatable.lambda.functions.specialized;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 
-import java.util.function.Function;
-
 /**
  * A specialized {@link Fn1} that returns a <code>Boolean</code>.
  *
@@ -17,19 +15,6 @@ public interface Predicate<A> extends Fn1<A, Boolean>, java.util.function.Predic
     @Override
     default boolean test(A a) {
         return apply(a);
-    }
-
-    /**
-     * Override of {@link Function#compose(Function)}, returning an instance of <code>Predicate</code> for
-     * compatibility. Right-to-left composition.
-     *
-     * @param before the function who's return value is this predicate's argument
-     * @param <Z>    the new argument type
-     * @return a new predicate of Z (the new argument type)
-     */
-    @Override
-    default <Z> Predicate<Z> compose(Function<? super Z, ? extends A> before) {
-        return Fn1.super.compose(before)::apply;
     }
 
     /**
@@ -90,7 +75,7 @@ public interface Predicate<A> extends Fn1<A, Boolean>, java.util.function.Predic
      * @param <A>       the input type
      * @return the predicate
      */
-    static <A> Predicate<A> predicate(Function<? super A, ? extends Boolean> predicate) {
+    static <A> Predicate<A> predicate(Fn1<? super A, ? extends Boolean> predicate) {
         return predicate::apply;
     }
 }

@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Functor;
 import com.jnape.palatable.lambda.functor.Profunctor;
 
-import java.util.function.Function;
-
 /**
  * A generic supertype representation for profunctor optics.
  * <p>
@@ -176,8 +174,7 @@ public interface Optic<P extends Profunctor<?, ?, ? extends P>, F extends Functo
             FB extends Functor<B, ? extends F>,
             FT extends Functor<T, ? extends F>,
             PAFB extends Profunctor<A, FB, ? extends P>,
-            PSFT extends Profunctor<S, FT, ? extends P>> Optic<P, F, S, T, A, B> optic(
-            Function<PAFB, PSFT> fn) {
+            PSFT extends Profunctor<S, FT, ? extends P>> Optic<P, F, S, T, A, B> optic(Fn1<PAFB, PSFT> fn) {
         return new Optic<P, F, S, T, A, B>() {
             @Override
             @SuppressWarnings("unchecked")

@@ -24,7 +24,7 @@ public class TraversableLaws<Trav extends Traversable<?, Trav>> implements Trait
     @Override
     public void test(Traversable<?, Trav> traversable) {
         Present.<String>present((x, y) -> x + "\n\t - " + y)
-                .<Function<Traversable<?, Trav>, Maybe<String>>>foldMap(
+                .<Fn1<Traversable<?, Trav>, Maybe<String>>>foldMap(
                         f -> f.apply(traversable),
                         asList(this::testNaturality,
                                this::testIdentity,
@@ -46,10 +46,10 @@ public class TraversableLaws<Trav extends Traversable<?, Trav>> implements Trait
                 x -> right(x);
 
         return t.apply(trav.traverse(f, pureFn).<Object>fmap(id()).coerce())
-                       .equals(trav.traverse(t.compose(f), pureFn2).<Object>fmap(id()).coerce())
+                       .equals(trav.traverse(t.contraMap(f), pureFn2).<Object>fmap(id()).coerce())
                ? nothing()
                : just("naturality (t.apply(trav.traverse(f, pureFn).<Object>fmap(id()).coerce())\n" +
-                              "                .equals(trav.traverse(t.compose(f), pureFn2).<Object>fmap(id()).coerce()))");
+                              "                .equals(trav.traverse(t.contraMap(f), pureFn2).<Object>fmap(id()).coerce()))");
     }
 
     private Maybe<String> testIdentity(Traversable<?, Trav> trav) {
@@ -62,10 +62,10 @@ public class TraversableLaws<Trav extends Traversable<?, Trav>> implements Trait
         Fn1<Object, Identity<Object>>                 f = Identity::new;
         Fn1<Object, Applicative<Object, Identity<?>>> g = x -> new Identity<>(x);
 
-        return trav.traverse(f.andThen(x -> x.fmap(g)).andThen(Compose::new), x -> new Compose<>(new Identity<>(new Identity<>(x))))
+        return trav.traverse(f.fmap(x -> x.fmap(g)).fmap(Compose::new), x -> new Compose<>(new Identity<>(new Identity<>(x))))
                        .equals(new Compose<>(trav.traverse(f, x -> new Identity<>(x)).fmap(t -> t.traverse(g, x -> new Identity<>(x)))))
                ? nothing()
-               : just("compose (trav.traverse(f.andThen(x -> x.fmap(g)).andThen(Compose::new), x -> new Compose<>(new Identity<>(new Identity<>(x))))\n" +
+               : just("compose (trav.traverse(f.fmap(x -> x.fmap(g)).fmap(Compose::new), x -> new Compose<>(new Identity<>(new Identity<>(x))))\n" +
                               "                .equals(new Compose<Identity, Identity, Traversable<Object, Trav>>(trav.traverse(f, x -> new Identity<>(x)).fmap(t -> t.traverse(g, x -> new Identity<>(x))))))");
     }
 }

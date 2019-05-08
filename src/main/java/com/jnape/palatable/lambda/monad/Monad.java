@@ -48,7 +48,7 @@ public interface Monad<A, M extends Monad<?, M>> extends Applicative<A, M> {
      */
     @Override
     default <B> Monad<B, M> fmap(Fn1<? super A, ? extends B> fn) {
-        return flatMap(fn.andThen(this::pure));
+        return flatMap(fn.fmap(this::pure));
     }
 
     /**

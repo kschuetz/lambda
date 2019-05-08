@@ -8,8 +8,6 @@ import com.jnape.palatable.lambda.functor.Cocartesian;
 import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.optics.Prism;
 
-import java.util.function.Function;
-
 import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.choice.Choice2.a;
 import static com.jnape.palatable.lambda.adt.choice.Choice2.b;
@@ -39,7 +37,7 @@ public final class Market<A, B, S, T> implements
     /**
      * Extract the mapping <code>B -&gt; T</code>.
      *
-     * @return a <code>{@link Function}&lt;B, T&gt;</code>
+     * @return a <code>{@link Fn1}&lt;B, T&gt;</code>
      */
     public Fn1<? super B, ? extends T> bt() {
         return bt;
@@ -48,7 +46,7 @@ public final class Market<A, B, S, T> implements
     /**
      * Extract the mapping <code>S -&gt; {@link Either}&lt;T, A&gt;</code>.
      *
-     * @return a <code>{@link Function}&lt;S, {@link Either}&lt;T, A&gt;&gt;</code>
+     * @return a <code>{@link Fn1}&lt;S, {@link Either}&lt;T, A&gt;&gt;</code>
      */
     public Fn1<? super S, ? extends Either<T, A>> sta() {
         return sta;

@@ -21,7 +21,7 @@ public class ApplicativeLaws<App extends Applicative<?, App>> implements Trait<A
     @Override
     public void test(Applicative<?, App> applicative) {
         Present.<String>present((x, y) -> x + "\n\t - " + y)
-                .<Function<Applicative<?, App>, Maybe<String>>>foldMap(
+                .<Fn1<Applicative<?, App>, Maybe<String>>>foldMap(
                         f -> f.apply(applicative),
                         asList(this::testIdentity,
                                this::testComposition,
@@ -51,7 +51,7 @@ public class ApplicativeLaws<App extends Applicative<?, App>> implements Trait<A
 
         Fn1<Fn1<? super String, ? extends String>,
                 Fn1<? super Fn1<? super String, ? extends String>,
-                        Fn1<? super String, ? extends String>>> compose = x -> x::compose;
+                        Fn1<? super String, ? extends String>>> compose = x -> x::contraMap;
         Applicative<Fn1<? super String, ? extends String>, App> u = applicative.pure(x -> x + firstInt);
         Applicative<Fn1<? super String, ? extends String>, App> v = applicative.pure(x -> x + secondInt);
         Applicative<String, App>                                w = applicative.pure("result: ");

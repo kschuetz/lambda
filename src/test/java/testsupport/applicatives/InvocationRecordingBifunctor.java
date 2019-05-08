@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public final class InvocationRecordingBifunctor<A, B> implements Bifunctor<A, B, InvocationRecordingBifunctor<?, ?>> {
-    private final AtomicReference<Function<?, ?>> leftFn;
-    private final AtomicReference<Function<?, ?>> rightFn;
+    private final AtomicReference<Fn1<?, ?>> leftFn;
+    private final AtomicReference<Fn1<?, ?>> rightFn;
 
-    public InvocationRecordingBifunctor(AtomicReference<Function<?, ?>> leftFn,
-                                        AtomicReference<Function<?, ?>> rightFn) {
+    public InvocationRecordingBifunctor(AtomicReference<Fn1<?, ?>> leftFn,
+                                        AtomicReference<Fn1<?, ?>> rightFn) {
         this.leftFn = leftFn;
         this.rightFn = rightFn;
     }

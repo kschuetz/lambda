@@ -21,7 +21,7 @@ public class MonadLaws<M extends Monad<?, M>> implements Trait<Monad<?, M>> {
     @Override
     public void test(Monad<?, M> m) {
         Present.<String>present((x, y) -> x + "\n\t - " + y)
-                .<Function<Monad<?, M>, Maybe<String>>>foldMap(f -> f.apply(m), asList(
+                .<Fn1<Monad<?, M>, Maybe<String>>>foldMap(f -> f.apply(m), asList(
                         this::testLeftIdentity,
                         this::testRightIdentity,
                         this::testAssociativity,
@@ -33,7 +33,7 @@ public class MonadLaws<M extends Monad<?, M>> implements Trait<Monad<?, M>> {
 
     private Maybe<String> testLeftIdentity(Monad<?, M> m) {
         Object                        a  = new Object();
-        Fn1<Object, Monad<Object, M>> fn = id().andThen(m::pure);
+        Fn1<Object, Monad<Object, M>> fn = id().fmap(m::pure);
         return m.pure(a).flatMap(fn).equals(fn.apply(a))
                ? nothing()
                : just("left identity (m.pure(a).flatMap(fn).equals(fn.apply(a)))");

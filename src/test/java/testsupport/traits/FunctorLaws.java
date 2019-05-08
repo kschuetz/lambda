@@ -19,7 +19,7 @@ public class FunctorLaws<F extends Functor<?, F>> implements Trait<Functor<?, F>
     @Override
     public void test(Functor<?, F> f) {
         Present.<String>present((x, y) -> x + "\n\t - " + y)
-                .<Function<Functor<?, F>, Maybe<String>>>foldMap(
+                .<Fn1<Functor<?, F>, Maybe<String>>>foldMap(
                         fn -> fn.apply(f),
                         asList(this::testIdentity,
                                this::testComposition))
@@ -38,8 +38,8 @@ public class FunctorLaws<F extends Functor<?, F>> implements Trait<Functor<?, F>
         Functor<Integer, F>   subject = functor.fmap(constantly(1));
         Fn1<Integer, Integer> f       = x -> x * 3;
         Fn1<Integer, Integer> g       = x -> x - 2;
-        return subject.fmap(f.compose(g)).equals(subject.fmap(g).fmap(f))
+        return subject.fmap(f.contraMap(g)).equals(subject.fmap(g).fmap(f))
                ? nothing()
-               : just("composition (functor.fmap(f.compose(g)).equals(functor.fmap(g).fmap(f)))");
+               : just("composition (functor.fmap(f.contraMap(g)).equals(functor.fmap(g).fmap(f)))");
     }
 }

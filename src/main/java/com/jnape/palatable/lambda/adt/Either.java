@@ -2,11 +2,13 @@ package com.jnape.palatable.lambda.adt;
 
 import com.jnape.palatable.lambda.adt.choice.Choice3;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
+import com.jnape.palatable.lambda.functions.Effect;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.builtin.fn2.Peek;
 import com.jnape.palatable.lambda.functions.builtin.fn2.Peek2;
-import com.jnape.palatable.lambda.functions.specialized.checked.CheckedRunnable;
+import com.jnape.palatable.lambda.functions.specialized.SideEffect;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Bifunctor;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
@@ -14,10 +16,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static com.jnape.palatable.lambda.functions.builtin.fn3.FoldLeft.foldLeft;
@@ -58,7 +56,7 @@ public abstract class Either<L, R> implements
      * @param recoveryFn a function from L to R
      * @return either the wrapped value (if right) or the result of the left value applied to recoveryFn
      */
-    public final R recover(Function<? super L, ? extends R> recoveryFn) {
+    public final R recover(Fn1<? super L, ? extends R> recoveryFn) {
         return match(recoveryFn, id());
     }
 
@@ -69,7 +67,7 @@ public abstract class Either<L, R> implements
      * @param forfeitFn a function from R to L
      * @return either the wrapped value (if left) or the result of the right value applied to forfeitFn
      */
-    public final L forfeit(Function<? super R, ? extends L> forfeitFn) {
+    public final L forfeit(Fn1<? super R, ? extends L> forfeitFn) {
         return match(id(), forfeitFn);
     }
 
@@ -77,13 +75,13 @@ public abstract class Either<L, R> implements
      * Return the wrapped value if this is a right; otherwise, map the wrapped left value to a <code>T</code> and throw
      * it.
      *
-     * @param throwableFn a function from L to T
      * @param <T>         the left parameter type (the throwable type)
+     * @param throwableFn a function from L to T
      * @return the wrapped value if this is a right
      * @throws T the result of applying the wrapped left value to throwableFn, if this is a left
      */
-    public final <T extends Throwable> R orThrow(Function<? super L, ? extends T> throwableFn) throws T {
-        return match((Fn1<L, R>) l -> {
+    public final <T extends Throwable> R orThrow(Fn1<? super L, ? extends T> throwableFn) throws T {
+        return match(l -> {
             throw throwableFn.apply(l);
         }, id());
     }
@@ -94,13 +92,13 @@ public abstract class Either<L, R> implements
      * <p>
      * If this is a left value, return it.
      *
-     * @param pred         the predicate to apply to a right value
-     * @param leftSupplier the supplier of a left value if pred fails
+     * @param pred    the predicate to apply to a right value
+     * @param leftFn0 the supplier of a left value if pred fails
      * @return this if a left value or a right value that pred matches; otherwise, the result of leftSupplier wrapped in
      * a left
      */
-    public final Either<L, R> filter(Fn1<? super R, ? extends Boolean> pred, Supplier<L> leftSupplier) {
-        return filter(pred, __ -> leftSupplier.get());
+    public final Either<L, R> filter(Fn1<? super R, ? extends Boolean> pred, Fn0<L> leftFn0) {
+        return filter(pred, __ -> leftFn0.apply());
     }
 
     /**
@@ -131,7 +129,7 @@ public abstract class Either<L, R> implements
     @Override
     @SuppressWarnings("RedundantTypeArguments")
     public <R2> Either<L, R2> flatMap(Fn1<? super R, ? extends Monad<R2, Either<L, ?>>> rightFn) {
-        return match(Either::left, rightFn.andThen(Monad<R2, Either<L, ?>>::coerce));
+        return match(Either::left, rightFn.fmap(Monad<R2, Either<L, ?>>::coerce));
     }
 
     @Override
@@ -152,8 +150,8 @@ public abstract class Either<L, R> implements
      */
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public final Either<L, R> merge(BiFunction<? super L, ? super L, ? extends L> leftFn,
-                                    BiFunction<? super R, ? super R, ? extends R> rightFn,
+    public final Either<L, R> merge(Fn2<? super L, ? super L, ? extends L> leftFn,
+                                    Fn2<? super R, ? super R, ? extends R> rightFn,
                                     Either<L, R>... others) {
         return foldLeft((x, y) -> x.match(l1 -> y.match(l2 -> left(leftFn.apply(l1, l2)), r -> left(l1)),
                                           r1 -> y.match(Either::left, r2 -> right(rightFn.apply(r1, r2)))),
@@ -164,22 +162,22 @@ public abstract class Either<L, R> implements
     /**
      * Perform side-effects against a wrapped right value, returning back the <code>Either</code> unaltered.
      *
-     * @param rightConsumer the effecting consumer
+     * @param effect the effecting consumer
      * @return the Either, unaltered
      */
-    public Either<L, R> peek(Consumer<R> rightConsumer) {
-        return Peek.peek(rightConsumer, this);
+    public Either<L, R> peek(Effect<R> effect) {
+        return Peek.peek(effect, this);
     }
 
     /**
      * Perform side-effects against a wrapped right or left value, returning back the <code>Either</code> unaltered.
      *
-     * @param leftConsumer  the effecting consumer for left values
-     * @param rightConsumer the effecting consumer for right values
+     * @param leftEffect  the effecting consumer for left values
+     * @param rightEffect the effecting consumer for right values
      * @return the Either, unaltered
      */
-    public Either<L, R> peek(Consumer<L> leftConsumer, Consumer<R> rightConsumer) {
-        return Peek2.peek2(leftConsumer, rightConsumer, this);
+    public Either<L, R> peek(Effect<L> leftEffect, Effect<R> rightEffect) {
+        return Peek2.peek2(leftEffect, rightEffect, this);
     }
 
     /**
@@ -187,13 +185,13 @@ public abstract class Either<L, R> implements
      * <code>V</code>), unwrap the value stored in this <code>Either</code>, apply the appropriate mapping function,
      * and return the result.
      *
+     * @param <V>     the result type
      * @param leftFn  the left value mapping function
      * @param rightFn the right value mapping function
-     * @param <V>     the result type
      * @return the result of applying the appropriate mapping function to the wrapped value
      */
     @Override
-    public abstract <V> V match(Function<? super L, ? extends V> leftFn, Function<? super R, ? extends V> rightFn);
+    public abstract <V> V match(Fn1<? super L, ? extends V> leftFn, Fn1<? super R, ? extends V> rightFn);
 
     /**
      * {@inheritDoc}
@@ -304,67 +302,65 @@ public abstract class Either<L, R> implements
      * Convert a {@link Maybe}&lt;R&gt; into an <code>Either&lt;L, R&gt;</code>, supplying the left value from
      * <code>leftFn</code> in the case of {@link Maybe#nothing()}.
      *
-     * @param maybe  the maybe
-     * @param leftFn the supplier to use for left values
-     * @param <L>    the left parameter type
-     * @param <R>    the right parameter type
+     * @param <L>     the left parameter type
+     * @param <R>     the right parameter type
+     * @param maybe   the maybe
+     * @param leftFn0 the supplier to use for left values
      * @return a right value of the contained maybe value, or a left value of leftFn's result
      */
-    public static <L, R> Either<L, R> fromMaybe(Maybe<R> maybe, Supplier<L> leftFn) {
+    public static <L, R> Either<L, R> fromMaybe(Maybe<R> maybe, Fn0<L> leftFn0) {
         return maybe.<Either<L, R>>fmap(Either::right)
-                .orElseGet(() -> left(leftFn.get()));
+                .orElseGet(() -> left(leftFn0.apply()));
     }
 
     /**
      * Attempt to execute the {@link Fn0}, returning its result in a right value. If the supplier throws an
      * exception, apply leftFn to it, wrap it in a left value and return it.
      *
-     * @param supplier the supplier of the right value
-     * @param leftFn   a function mapping E to L
-     * @param <L>      the left parameter type
-     * @param <R>      the right parameter type
+     * @param <L>    the left parameter type
+     * @param <R>    the right parameter type
+     * @param fn0    the supplier of the right value
+     * @param leftFn a function mapping E to L
      * @return the supplier result as a right value, or leftFn's mapping result as a left value
      */
-    public static <L, R> Either<L, R> trying(Fn0<? extends R> supplier,
-                                             Function<? super Throwable, ? extends L> leftFn) {
-        return Try.<R>trying(supplier::get).toEither(leftFn);
+    public static <L, R> Either<L, R> trying(Fn0<? extends R> fn0, Fn1<? super Throwable, ? extends L> leftFn) {
+        return Try.<R>trying(fn0).toEither(leftFn);
     }
 
     /**
      * Attempt to execute the {@link Fn0}, returning its result in a right value. If the supplier throws an
      * exception, wrap it in a left value and return it.
      *
-     * @param supplier the supplier of the right value
-     * @param <R>      the right parameter type
+     * @param fn0 the supplier of the right value
+     * @param <R> the right parameter type
      * @return the supplier result as a right value, or a left value of the thrown exception
      */
-    public static <R> Either<Throwable, R> trying(Fn0<? extends R> supplier) {
-        return trying(supplier, id());
+    public static <R> Either<Throwable, R> trying(Fn0<? extends R> fn0) {
+        return trying(fn0, id());
     }
 
     /**
-     * Attempt to execute the {@link CheckedRunnable}, returning {@link Unit} in a right value. If the runnable throws
+     * Attempt to execute the {@link SideEffect}, returning {@link Unit} in a right value. If the runnable throws
      * an exception, apply <code>leftFn</code> to it, wrap it in a left value, and return it.
      *
-     * @param runnable the runnable
-     * @param leftFn   a function mapping E to L
-     * @param <L>      the left parameter type
+     * @param <L>        the left parameter type
+     * @param sideEffect the runnable
+     * @param leftFn     a function mapping E to L
      * @return {@link Unit} as a right value, or leftFn's mapping result as a left value
      */
-    public static <L> Either<L, Unit> trying(CheckedRunnable<?> runnable,
-                                             Function<? super Throwable, ? extends L> leftFn) {
-        return Try.trying(runnable).toEither(leftFn);
+    public static <L> Either<L, Unit> trying(SideEffect sideEffect, Fn1<? super Throwable, ? extends L> leftFn) {
+        return Try.trying(sideEffect).toEither(leftFn);
     }
 
     /**
-     * Attempt to execute the {@link CheckedRunnable}, returning {@link Unit} in a right value. If the runnable throws
+     * Attempt to execute the {@link SideEffect}, returning {@link Unit} in a right value. If the runnable throws
      * exception, wrap it in a left value and return it.
      *
-     * @param runnable the runnable
+     * @param sideEffect the runnable
      * @return {@link Unit} as a right value, or a left value of the thrown exception
      */
-    public static Either<Throwable, Unit> trying(CheckedRunnable<?> runnable) {
-        return trying(runnable, id());
+    public static Either<Throwable, Unit> trying(SideEffect sideEffect) {
+        return trying(sideEffect, id());
     }
 
     /**
@@ -399,7 +395,7 @@ public abstract class Either<L, R> implements
         }
 
         @Override
-        public <V> V match(Function<? super L, ? extends V> leftFn, Function<? super R, ? extends V> rightFn) {
+        public <V> V match(Fn1<? super L, ? extends V> leftFn, Fn1<? super R, ? extends V> rightFn) {
             return leftFn.apply(l);
         }
 
@@ -429,7 +425,7 @@ public abstract class Either<L, R> implements
         }
 
         @Override
-        public <V> V match(Function<? super L, ? extends V> leftFn, Function<? super R, ? extends V> rightFn) {
+        public <V> V match(Fn1<? super L, ? extends V> leftFn, Fn1<? super R, ? extends V> rightFn) {
             return rightFn.apply(r);
         }
 

@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.functions.specialized.checked.Runtime;
 import com.jnape.palatable.lambda.functor.Applicative;
 
-import java.util.function.BiFunction;
-
 /**
  * A function taking six arguments. Defined in terms of {@link Fn7}, so similarly auto-curried.
  *
@@ -186,12 +184,6 @@ public interface Fn8<A, B, C, D, E, F, G, H, I> extends Fn7<A, B, C, D, E, F, G,
     @Override
     default <Z> Fn8<Z, B, C, D, E, F, G, H, I> contraMap(Fn1<? super Z, ? extends A> fn) {
         return fn8(Fn7.super.contraMap(fn));
-    }
-
-    @Override
-    default <Y, Z> Fn8<Y, Z, B, C, D, E, F, G, Fn1<H, I>> compose(
-            BiFunction<? super Y, ? super Z, ? extends A> before) {
-        return Fn7.super.compose(before);
     }
 
     @Override

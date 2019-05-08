@@ -17,8 +17,6 @@ import com.jnape.palatable.lambda.optics.functions.Pre;
 import com.jnape.palatable.lambda.optics.functions.Re;
 import com.jnape.palatable.lambda.optics.functions.View;
 
-import java.util.function.Function;
-
 /**
  * Prisms are {@link Iso Isos} that can fail in one direction. Example:
  * <pre>
@@ -64,7 +62,7 @@ public interface Prism<S, T, A, B> extends
      *
      * @return a {@link Tuple2 tuple} of the two mappings encapsulated by this {@link Prism}
      */
-    default Tuple2<Function<? super B, ? extends T>, Function<? super S, ? extends Either<T, A>>> unPrism() {
+    default Tuple2<Fn1<? super B, ? extends T>, Fn1<? super S, ? extends Either<T, A>>> unPrism() {
         return Tuple2.fill(this.<Market<A, B, ?, ?>, Identity<?>, Identity<B>, Identity<T>,
                 Market<A, B, A, Identity<B>>, Market<A, B, S, Identity<T>>>apply(
                 new Market<>(Identity::new, Either::right)).fmap(Identity::runIdentity))

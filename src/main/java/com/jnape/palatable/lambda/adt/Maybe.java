@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice3;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.adt.hlist.HList;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
+import com.jnape.palatable.lambda.functions.Effect;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.Peek;
@@ -16,9 +17,6 @@ import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
@@ -45,11 +43,11 @@ public abstract class Maybe<A> implements
     /**
      * If the value is present, return it; otherwise, return the value supplied by <code>otherSupplier</code>.
      *
-     * @param otherSupplier the supplier for the other value
+     * @param otherFn0 the supplier for the other value
      * @return this value, or the supplied other value
      */
-    public final A orElseGet(Supplier<A> otherSupplier) {
-        return match(__ -> otherSupplier.get(), id());
+    public final A orElseGet(Fn0<A> otherFn0) {
+        return match(__ -> otherFn0.apply(), id());
     }
 
     /**
@@ -73,7 +71,7 @@ public abstract class Maybe<A> implements
      */
     public final <E extends Throwable> A orElseThrow(Fn0<? extends E> throwableSupplier) throws E {
         return orElseGet(fn0(() -> {
-            throw throwableSupplier.get();
+            throw throwableSupplier.apply();
         }));
     }
 
@@ -84,7 +82,7 @@ public abstract class Maybe<A> implements
      * @param predicate the predicate to apply to the possibly absent value
      * @return maybe the present value that satisfied the predicate
      */
-    public final Maybe<A> filter(Function<? super A, ? extends Boolean> predicate) {
+    public final Maybe<A> filter(Fn1<? super A, ? extends Boolean> predicate) {
         return flatMap(a -> predicate.apply(a) ? just(a) : nothing());
     }
 
@@ -92,12 +90,12 @@ public abstract class Maybe<A> implements
      * If this value is absent, return the value supplied by <code>lSupplier</code> wrapped in <code>Either.left</code>.
      * Otherwise, wrap the value in <code>Either.right</code> and return it.
      *
-     * @param lSupplier the supplier for the left value
-     * @param <L>       the left parameter type
+     * @param <L>  the left parameter type
+     * @param lFn0 the supplier for the left value
      * @return this value wrapped in an Either.right, or an Either.left around the result of lSupplier
      */
-    public final <L> Either<L, A> toEither(Supplier<L> lSupplier) {
-        return fmap(Either::<L, A>right).orElseGet(() -> left(lSupplier.get()));
+    public final <L> Either<L, A> toEither(Fn0<L> lFn0) {
+        return fmap(Either::<L, A>right).orElseGet(() -> left(lFn0.apply()));
     }
 
     /**
@@ -175,7 +173,7 @@ public abstract class Maybe<A> implements
     @SuppressWarnings("RedundantTypeArguments")
     @Override
     public final <B> Maybe<B> flatMap(Fn1<? super A, ? extends Monad<B, Maybe<?>>> f) {
-        return match(constantly(nothing()), f.andThen(Monad<B, Maybe<?>>::coerce));
+        return match(constantly(nothing()), f.fmap(Monad<B, Maybe<?>>::coerce));
     }
 
     /**
@@ -205,11 +203,11 @@ public abstract class Maybe<A> implements
     /**
      * If this value is present, accept it by <code>consumer</code>; otherwise, do nothing.
      *
-     * @param consumer the consumer
+     * @param effect the consumer
      * @return the same Maybe instance
      */
-    public final Maybe<A> peek(Consumer<A> consumer) {
-        return Peek.peek(consumer, this);
+    public final Maybe<A> peek(Effect<A> effect) {
+        return Peek.peek(effect, this);
     }
 
     @Override
@@ -289,7 +287,7 @@ public abstract class Maybe<A> implements
         }
 
         @Override
-        public <R> R match(Function<? super Unit, ? extends R> aFn, Function<? super A, ? extends R> bFn) {
+        public <R> R match(Fn1<? super Unit, ? extends R> aFn, Fn1<? super A, ? extends R> bFn) {
             return aFn.apply(UNIT);
         }
 
@@ -308,7 +306,7 @@ public abstract class Maybe<A> implements
         }
 
         @Override
-        public <R> R match(Function<? super Unit, ? extends R> aFn, Function<? super A, ? extends R> bFn) {
+        public <R> R match(Fn1<? super Unit, ? extends R> aFn, Fn1<? super A, ? extends R> bFn) {
             return bFn.apply(a);
         }
 

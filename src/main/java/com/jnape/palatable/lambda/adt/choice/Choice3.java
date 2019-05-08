@@ -14,7 +14,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into3.into3;
 import static com.jnape.palatable.lambda.functor.builtin.Lazy.lazy;
@@ -59,8 +58,8 @@ public abstract class Choice3<A, B, C> implements
      * {@inheritDoc}
      */
     @Override
-    public final Choice2<A, B> converge(Function<? super C, ? extends CoProduct2<A, B, ?>> convergenceFn) {
-        return match(Choice2::a, Choice2::b, convergenceFn.andThen(cp2 -> cp2.match(Choice2::a, Choice2::b)));
+    public final Choice2<A, B> converge(Fn1<? super C, ? extends CoProduct2<A, B, ?>> convergenceFn) {
+        return match(Choice2::a, Choice2::b, convergenceFn.fmap(cp2 -> cp2.match(Choice2::a, Choice2::b)));
     }
 
     /**
@@ -209,8 +208,8 @@ public abstract class Choice3<A, B, C> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn) {
             return aFn.apply(a);
         }
 
@@ -242,8 +241,8 @@ public abstract class Choice3<A, B, C> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn) {
             return bFn.apply(b);
         }
 
@@ -275,8 +274,8 @@ public abstract class Choice3<A, B, C> implements
         }
 
         @Override
-        public <R> R match(Function<? super A, ? extends R> aFn, Function<? super B, ? extends R> bFn,
-                           Function<? super C, ? extends R> cFn) {
+        public <R> R match(Fn1<? super A, ? extends R> aFn, Fn1<? super B, ? extends R> bFn,
+                           Fn1<? super C, ? extends R> cFn) {
             return cFn.apply(c);
         }
 

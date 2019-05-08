@@ -8,8 +8,6 @@ import com.jnape.palatable.lambda.functor.builtin.Lazy;
 import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
-import java.util.function.Function;
-
 /**
  * A singleton HList. Supports random access.
  *
@@ -85,7 +83,7 @@ public class SingletonHList<_1> extends HCons<_1, HNil> implements
      * @param <R> the return type of the function
      * @return the result of applying the head to the function
      */
-    public <R> R into(Function<? super _1, ? extends R> fn) {
+    public <R> R into(Fn1<? super _1, ? extends R> fn) {
         return fn.apply(head());
     }
 }
