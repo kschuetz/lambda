@@ -5,11 +5,10 @@ import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functor.Functor;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Given a {@link Consumer}, "peek" at the value contained inside a {@link Functor} via
- * {@link Functor#fmap(Function)}, applying the {@link Consumer} to the contained value, if there is one.
+ * {@link Functor#fmap(Fn1)}, applying the {@link Consumer} to the contained value, if there is one.
  *
  * @param <A>  the functor parameter type
  * @param <FA> the functor type

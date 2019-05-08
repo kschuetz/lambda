@@ -106,7 +106,9 @@ public abstract class Try<A> implements Monad<A, Try<?>>, Traversable<A, Try<?>>
     /**
      * If this is a success value, return it. Otherwise, rethrow the captured failure.
      *
+     * @param <T> a declarable exception type used for catching checked exceptions
      * @return possibly the success value
+     * @throws T anything that the call site may want to explicitly catch or indicate could be thrown
      */
     public abstract <T extends Throwable> A orThrow() throws T;
 
@@ -146,7 +148,7 @@ public abstract class Try<A> implements Monad<A, Try<?>>, Traversable<A, Try<?>>
      * {@inheritDoc}
      */
     @Override
-    public <B> Try<B> fmap(Function<? super A, ? extends B> fn) {
+    public <B> Try<B> fmap(Fn1<? super A, ? extends B> fn) {
         return Monad.super.<B>fmap(fn).coerce();
     }
 
@@ -154,7 +156,7 @@ public abstract class Try<A> implements Monad<A, Try<?>>, Traversable<A, Try<?>>
      * {@inheritDoc}
      */
     @Override
-    public <B> Try<B> flatMap(Function<? super A, ? extends Monad<B, Try<?>>> f) {
+    public <B> Try<B> flatMap(Fn1<? super A, ? extends Monad<B, Try<?>>> f) {
         return match(Try::failure, a -> f.apply(a).coerce());
     }
 
@@ -170,13 +172,15 @@ public abstract class Try<A> implements Monad<A, Try<?>>, Traversable<A, Try<?>>
      * {@inheritDoc}
      */
     @Override
-    public <B> Try<B> zip(Applicative<Function<? super A, ? extends B>, Try<?>> appFn) {
+    public <B> Try<B> zip(Applicative<Fn1<? super A, ? extends B>, Try<?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <B> Lazy<Try<B>> lazyZip(
-            Lazy<? extends Applicative<Function<? super A, ? extends B>, Try<?>>> lazyAppFn) {
+    public <B> Lazy<Try<B>> lazyZip(Lazy<? extends Applicative<Fn1<? super A, ? extends B>, Try<?>>> lazyAppFn) {
         return match(f -> lazy(failure(f)),
                      s -> lazyAppFn.fmap(tryF -> tryF.<B>fmap(f -> f.apply(s)).coerce()));
     }
@@ -204,8 +208,8 @@ public abstract class Try<A> implements Monad<A, Try<?>>, Traversable<A, Try<?>>
     @SuppressWarnings("unchecked")
     public <B, App extends Applicative<?, App>, TravB extends Traversable<B, Try<?>>,
             AppB extends Applicative<B, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super A, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super A, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(t -> pure.apply((TravB) failure(t)),
                      a -> fn.apply(a).fmap(Try::success).<TravB>fmap(Applicative::coerce).coerce());
     }

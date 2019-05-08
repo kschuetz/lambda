@@ -66,7 +66,7 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <U> Market<A, B, S, U> flatMap(Function<? super T, ? extends Monad<U, Market<A, B, S, ?>>> f) {
+    public <U> Market<A, B, S, U> flatMap(Fn1<? super T, ? extends Monad<U, Market<A, B, S, ?>>> f) {
         return new Market<>(b -> f.apply(bt().apply(b)).<Market<A, B, S, U>>coerce().bt().apply(b),
                             s -> sta().apply(s).invert()
                                     .flatMap(t -> f.apply(t).<Market<A, B, S, U>>coerce().sta()
@@ -77,8 +77,8 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <U> Market<A, B, S, U> zip(Applicative<Function<? super T, ? extends U>, Market<A, B, S, ?>> appFn) {
-        Market<A, B, S, Function<? super T, ? extends U>> marketF = appFn.coerce();
+    public <U> Market<A, B, S, U> zip(Applicative<Fn1<? super T, ? extends U>, Market<A, B, S, ?>> appFn) {
+        Market<A, B, S, Fn1<? super T, ? extends U>> marketF = appFn.coerce();
         return new Market<>(b -> marketF.bt().apply(b).apply(bt().apply(b)),
                             s -> sta().apply(s).invert().zip(marketF.sta().apply(s).invert()).invert());
     }
@@ -87,7 +87,7 @@ public final class Market<A, B, S, T> implements
      * {@inheritDoc}
      */
     @Override
-    public <U> Market<A, B, S, U> fmap(Function<? super T, ? extends U> fn) {
+    public <U> Market<A, B, S, U> fmap(Fn1<? super T, ? extends U> fn) {
         return diMapR(fn::apply);
     }
 

@@ -9,8 +9,6 @@ import com.jnape.palatable.lambda.functor.builtin.Lazy;
 import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
-import java.util.function.Function;
-
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 
 /**
@@ -115,7 +113,7 @@ public class Tuple5<_1, _2, _3, _4, _5> extends HCons<_1, Tuple4<_2, _3, _4, _5>
     }
 
     @Override
-    public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> fmap(Function<? super _5, ? extends _5Prime> fn) {
+    public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> fmap(Fn1<? super _5, ? extends _5Prime> fn) {
         return Monad.super.<_5Prime>fmap(fn).coerce();
     }
 
@@ -144,13 +142,13 @@ public class Tuple5<_1, _2, _3, _4, _5> extends HCons<_1, Tuple4<_2, _3, _4, _5>
 
     @Override
     public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> zip(
-            Applicative<Function<? super _5, ? extends _5Prime>, Tuple5<_1, _2, _3, _4, ?>> appFn) {
+            Applicative<Fn1<? super _5, ? extends _5Prime>, Tuple5<_1, _2, _3, _4, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
     @Override
     public <_5Prime> Lazy<Tuple5<_1, _2, _3, _4, _5Prime>> lazyZip(
-            Lazy<? extends Applicative<Function<? super _5, ? extends _5Prime>, Tuple5<_1, _2, _3, _4, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super _5, ? extends _5Prime>, Tuple5<_1, _2, _3, _4, ?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<_5Prime, Tuple5<_1, _2, _3, _4, ?>>::coerce);
     }
 
@@ -166,15 +164,15 @@ public class Tuple5<_1, _2, _3, _4, _5> extends HCons<_1, Tuple4<_2, _3, _4, _5>
 
     @Override
     public <_5Prime> Tuple5<_1, _2, _3, _4, _5Prime> flatMap(
-            Function<? super _5, ? extends Monad<_5Prime, Tuple5<_1, _2, _3, _4, ?>>> f) {
+            Fn1<? super _5, ? extends Monad<_5Prime, Tuple5<_1, _2, _3, _4, ?>>> f) {
         return pure(f.apply(_5).<Tuple5<_1, _2, _3, _4, _5Prime>>coerce()._5());
     }
 
     @Override
     public <_5Prime, App extends Applicative<?, App>, TravB extends Traversable<_5Prime, Tuple5<_1, _2, _3, _4, ?>>,
             AppB extends Applicative<_5Prime, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super _5, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super _5, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return fn.apply(_5).fmap(_3Prime -> fmap(constantly(_3Prime))).<TravB>fmap(Applicative::coerce).coerce();
     }
 

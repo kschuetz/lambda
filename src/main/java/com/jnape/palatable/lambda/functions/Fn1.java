@@ -49,6 +49,7 @@ public interface Fn1<A, B> extends
      *
      * @param a the argument
      * @return the result of the function application
+     * @throws Throwable anything possibly thrown by the function
      */
     B checkedApply(A a) throws Throwable;
 
@@ -77,7 +78,7 @@ public interface Fn1<A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <C> Fn1<A, C> flatMap(Function<? super B, ? extends Monad<C, Fn1<A, ?>>> f) {
+    default <C> Fn1<A, C> flatMap(Fn1<? super B, ? extends Monad<C, Fn1<A, ?>>> f) {
         return a -> f.apply(apply(a)).<Fn1<A, C>>coerce().apply(a);
     }
 
@@ -89,7 +90,7 @@ public interface Fn1<A, B> extends
      * @return a function representing the composition of this function and f
      */
     @Override
-    default <C> Fn1<A, C> fmap(Function<? super B, ? extends C> f) {
+    default <C> Fn1<A, C> fmap(Fn1<? super B, ? extends C> f) {
         return Monad.super.<C>fmap(f).coerce();
     }
 
@@ -105,7 +106,7 @@ public interface Fn1<A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <C> Fn1<A, C> zip(Applicative<Function<? super B, ? extends C>, Fn1<A, ?>> appFn) {
+    default <C> Fn1<A, C> zip(Applicative<Fn1<? super B, ? extends C>, Fn1<A, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -114,15 +115,14 @@ public interface Fn1<A, B> extends
      */
     @SuppressWarnings("unchecked")
     default <C> Fn1<A, C> zip(Fn2<A, B, C> appFn) {
-        return zip((Fn1<A, Function<? super B, ? extends C>>) (Object) appFn);
+        return zip((Fn1<A, Fn1<? super B, ? extends C>>) (Object) appFn);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default <C> Lazy<Fn1<A, C>> lazyZip(
-            Lazy<? extends Applicative<Function<? super B, ? extends C>, Fn1<A, ?>>> lazyAppFn) {
+    default <C> Lazy<Fn1<A, C>> lazyZip(Lazy<? extends Applicative<Fn1<? super B, ? extends C>, Fn1<A, ?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<C, Fn1<A, ?>>::coerce);
     }
 

@@ -33,8 +33,6 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public final <C, D> These<C, D> biMap(Fn1<? super A, ? extends C> lFn,
@@ -46,7 +44,7 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
      * {@inheritDoc}
      */
     @Override
-    public final <C> These<A, C> flatMap(Function<? super B, ? extends Monad<C, These<A, ?>>> f) {
+    public final <C> These<A, C> flatMap(Fn1<? super B, ? extends Monad<C, These<A, ?>>> f) {
         return match(These::a, b -> f.apply(b).coerce(), into((a, b) -> f.apply(b).<These<A, C>>coerce().biMapL(constantly(a))));
     }
 
@@ -62,8 +60,8 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
     @SuppressWarnings("unchecked")
     public <C, App extends Applicative<?, App>, TravB extends Traversable<C, These<A, ?>>,
             AppB extends Applicative<C, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super B, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super B, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) a(a)),
                      b -> fn.apply(b).fmap(this::pure).<TravB>fmap(Applicative::coerce).coerce(),
                      into((a, b) -> fn.apply(b).fmap(c -> both(a, c)).<TravB>fmap(Applicative::coerce).coerce()));
@@ -71,7 +69,6 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -81,7 +78,6 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -93,7 +89,7 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
      * {@inheritDoc}
      */
     @Override
-    public final <C> These<A, C> fmap(Function<? super B, ? extends C> fn) {
+    public final <C> These<A, C> fmap(Fn1<? super B, ? extends C> fn) {
         return Monad.super.<C>fmap(fn).coerce();
     }
 
@@ -101,13 +97,13 @@ public abstract class These<A, B> implements CoProduct3<A, B, Tuple2<A, B>, Thes
      * {@inheritDoc}
      */
     @Override
-    public final <C> These<A, C> zip(Applicative<Function<? super B, ? extends C>, These<A, ?>> appFn) {
+    public final <C> These<A, C> zip(Applicative<Fn1<? super B, ? extends C>, These<A, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
     @Override
     public <C> Lazy<These<A, C>> lazyZip(
-            Lazy<? extends Applicative<Function<? super B, ? extends C>, These<A, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super B, ? extends C>, These<A, ?>>> lazyAppFn) {
         return projectA().<Lazy<These<A, C>>>fmap(a -> lazy(a(a)))
                 .orElseGet(() -> Monad.super.lazyZip(lazyAppFn).fmap(Monad<C, These<A, ?>>::coerce));
     }

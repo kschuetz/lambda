@@ -77,34 +77,28 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
      * {@inheritDoc}
      */
     @Override
-    public <H> Choice7<A, B, C, D, E, F, H> fmap(Function<? super G, ? extends H> fn) {
+    public <H> Choice7<A, B, C, D, E, F, H> fmap(Fn1<? super G, ? extends H> fn) {
         return Monad.super.<H>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <H> Choice7<A, B, C, D, E, H, G> biMapL(Fn1<? super F, ? extends H> fn) {
-        return (Choice7<A, B, C, D, E, H, G>) Bifunctor.super.biMapL(fn);
+        return (Choice7<A, B, C, D, E, H, G>) Bifunctor.super.<H>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <H> Choice7<A, B, C, D, E, F, H> biMapR(Fn1<? super G, ? extends H> fn) {
-        return (Choice7<A, B, C, D, E, F, H>) Bifunctor.super.biMapR(fn);
+        return (Choice7<A, B, C, D, E, F, H>) Bifunctor.super.<H>biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public <H, I> Choice7<A, B, C, D, E, H, I> biMap(Fn1<? super F, ? extends H> lFn,
@@ -125,7 +119,7 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
      */
     @Override
     public <H> Choice7<A, B, C, D, E, F, H> zip(
-            Applicative<Function<? super G, ? extends H>, Choice7<A, B, C, D, E, F, ?>> appFn) {
+            Applicative<Fn1<? super G, ? extends H>, Choice7<A, B, C, D, E, F, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -134,7 +128,7 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
      */
     @Override
     public <H> Lazy<Choice7<A, B, C, D, E, F, H>> lazyZip(
-            Lazy<? extends Applicative<Function<? super G, ? extends H>, Choice7<A, B, C, D, E, F, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super G, ? extends H>, Choice7<A, B, C, D, E, F, ?>>> lazyAppFn) {
         return match(a -> lazy(a(a)),
                      b -> lazy(b(b)),
                      c -> lazy(c(c)),
@@ -165,7 +159,7 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
      */
     @Override
     public <H> Choice7<A, B, C, D, E, F, H> flatMap(
-            Function<? super G, ? extends Monad<H, Choice7<A, B, C, D, E, F, ?>>> fn) {
+            Fn1<? super G, ? extends Monad<H, Choice7<A, B, C, D, E, F, ?>>> fn) {
         return match(Choice7::a, Choice7::b, Choice7::c, Choice7::d, Choice7::e, Choice7::f, g -> fn.apply(g).coerce());
     }
 
@@ -176,8 +170,8 @@ public abstract class Choice7<A, B, C, D, E, F, G> implements
     @SuppressWarnings("unchecked")
     public <H, App extends Applicative<?, App>, TravB extends Traversable<H, Choice7<A, B, C, D, E, F, ?>>,
             AppB extends Applicative<H, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super G, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super G, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) Choice7.<A, B, C, D, E, F, H>a(a)).coerce(),
                      b -> pure.apply((TravB) Choice7.<A, B, C, D, E, F, H>b(b)).coerce(),
                      c -> pure.apply((TravB) Choice7.<A, B, C, D, E, F, H>c(c)),

@@ -70,34 +70,28 @@ public abstract class Choice8<A, B, C, D, E, F, G, H> implements
      * {@inheritDoc}
      */
     @Override
-    public <I> Choice8<A, B, C, D, E, F, G, I> fmap(Function<? super H, ? extends I> fn) {
+    public <I> Choice8<A, B, C, D, E, F, G, I> fmap(Fn1<? super H, ? extends I> fn) {
         return Monad.super.<I>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <I> Choice8<A, B, C, D, E, F, I, H> biMapL(Fn1<? super G, ? extends I> fn) {
-        return (Choice8<A, B, C, D, E, F, I, H>) Bifunctor.super.biMapL(fn);
+        return (Choice8<A, B, C, D, E, F, I, H>) Bifunctor.super.<I>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <I> Choice8<A, B, C, D, E, F, G, I> biMapR(Fn1<? super H, ? extends I> fn) {
-        return (Choice8<A, B, C, D, E, F, G, I>) Bifunctor.super.biMapR(fn);
+        return (Choice8<A, B, C, D, E, F, G, I>) Bifunctor.super.<I>biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public <I, J> Choice8<A, B, C, D, E, F, I, J> biMap(Fn1<? super G, ? extends I> lFn,
@@ -118,7 +112,7 @@ public abstract class Choice8<A, B, C, D, E, F, G, H> implements
      */
     @Override
     public <I> Choice8<A, B, C, D, E, F, G, I> zip(
-            Applicative<Function<? super H, ? extends I>, Choice8<A, B, C, D, E, F, G, ?>> appFn) {
+            Applicative<Fn1<? super H, ? extends I>, Choice8<A, B, C, D, E, F, G, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -127,7 +121,7 @@ public abstract class Choice8<A, B, C, D, E, F, G, H> implements
      */
     @Override
     public <I> Lazy<Choice8<A, B, C, D, E, F, G, I>> lazyZip(
-            Lazy<? extends Applicative<Function<? super H, ? extends I>, Choice8<A, B, C, D, E, F, G, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super H, ? extends I>, Choice8<A, B, C, D, E, F, G, ?>>> lazyAppFn) {
         return match(a -> lazy(a(a)),
                      b -> lazy(b(b)),
                      c -> lazy(c(c)),
@@ -159,7 +153,7 @@ public abstract class Choice8<A, B, C, D, E, F, G, H> implements
      */
     @Override
     public <I> Choice8<A, B, C, D, E, F, G, I> flatMap(
-            Function<? super H, ? extends Monad<I, Choice8<A, B, C, D, E, F, G, ?>>> fn) {
+            Fn1<? super H, ? extends Monad<I, Choice8<A, B, C, D, E, F, G, ?>>> fn) {
         return match(Choice8::a, Choice8::b, Choice8::c, Choice8::d, Choice8::e, Choice8::f, Choice8::g, h -> fn.apply(h).coerce());
     }
 
@@ -170,8 +164,8 @@ public abstract class Choice8<A, B, C, D, E, F, G, H> implements
     @SuppressWarnings("unchecked")
     public <I, App extends Applicative<?, App>, TravB extends Traversable<I, Choice8<A, B, C, D, E, F, G, ?>>,
             AppB extends Applicative<I, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super H, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super H, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) Choice8.<A, B, C, D, E, F, G, I>a(a)).coerce(),
                      b -> pure.apply((TravB) Choice8.<A, B, C, D, E, F, G, I>b(b)).coerce(),
                      c -> pure.apply((TravB) Choice8.<A, B, C, D, E, F, G, I>c(c)),

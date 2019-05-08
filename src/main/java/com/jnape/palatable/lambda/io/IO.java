@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn0;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.builtin.Lazy;
 import com.jnape.palatable.lambda.monad.Monad;
@@ -103,7 +104,7 @@ public abstract class IO<A> implements Monad<A, IO<?>> {
      * {@inheritDoc}
      */
     @Override
-    public final <B> IO<B> fmap(Function<? super A, ? extends B> fn) {
+    public final <B> IO<B> fmap(Fn1<? super A, ? extends B> fn) {
         return Monad.super.<B>fmap(fn).coerce();
     }
 
@@ -111,7 +112,7 @@ public abstract class IO<A> implements Monad<A, IO<?>> {
      * {@inheritDoc}
      */
     @Override
-    public final <B> IO<B> zip(Applicative<Function<? super A, ? extends B>, IO<?>> appFn) {
+    public final <B> IO<B> zip(Applicative<Fn1<? super A, ? extends B>, IO<?>> appFn) {
         @SuppressWarnings("unchecked")
         IO<Object> source = (IO<Object>) this;
         @SuppressWarnings("unchecked")
@@ -123,7 +124,7 @@ public abstract class IO<A> implements Monad<A, IO<?>> {
      * {@inheritDoc}
      */
     @Override
-    public <B> Lazy<IO<B>> lazyZip(Lazy<? extends Applicative<Function<? super A, ? extends B>, IO<?>>> lazyAppFn) {
+    public <B> Lazy<IO<B>> lazyZip(Lazy<? extends Applicative<Fn1<? super A, ? extends B>, IO<?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<B, IO<?>>::coerce);
     }
 
@@ -147,7 +148,7 @@ public abstract class IO<A> implements Monad<A, IO<?>> {
      * {@inheritDoc}
      */
     @Override
-    public final <B> IO<B> flatMap(Function<? super A, ? extends Monad<B, IO<?>>> f) {
+    public final <B> IO<B> flatMap(Fn1<? super A, ? extends Monad<B, IO<?>>> f) {
         @SuppressWarnings("unchecked")
         IO<Object> source = (IO<Object>) this;
         @SuppressWarnings({"unchecked", "RedundantCast"})

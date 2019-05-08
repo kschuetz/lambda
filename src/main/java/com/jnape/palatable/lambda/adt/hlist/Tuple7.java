@@ -9,8 +9,6 @@ import com.jnape.palatable.lambda.functor.builtin.Lazy;
 import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
-import java.util.function.Function;
-
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 
 /**
@@ -153,7 +151,7 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
     }
 
     @Override
-    public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> fmap(Function<? super _7, ? extends _7Prime> fn) {
+    public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> fmap(Fn1<? super _7, ? extends _7Prime> fn) {
         return Monad.super.<_7Prime>fmap(fn).coerce();
     }
 
@@ -183,13 +181,13 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
 
     @Override
     public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> zip(
-            Applicative<Function<? super _7, ? extends _7Prime>, Tuple7<_1, _2, _3, _4, _5, _6, ?>> appFn) {
+            Applicative<Fn1<? super _7, ? extends _7Prime>, Tuple7<_1, _2, _3, _4, _5, _6, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
     @Override
     public <_7Prime> Lazy<Tuple7<_1, _2, _3, _4, _5, _6, _7Prime>> lazyZip(
-            Lazy<? extends Applicative<Function<? super _7, ? extends _7Prime>, Tuple7<_1, _2, _3, _4, _5, _6, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super _7, ? extends _7Prime>, Tuple7<_1, _2, _3, _4, _5, _6, ?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<_7Prime, Tuple7<_1, _2, _3, _4, _5, _6, ?>>::coerce);
     }
 
@@ -207,7 +205,7 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
 
     @Override
     public <_7Prime> Tuple7<_1, _2, _3, _4, _5, _6, _7Prime> flatMap(
-            Function<? super _7, ? extends Monad<_7Prime, Tuple7<_1, _2, _3, _4, _5, _6, ?>>> f) {
+            Fn1<? super _7, ? extends Monad<_7Prime, Tuple7<_1, _2, _3, _4, _5, _6, ?>>> f) {
         return pure(f.apply(_7).<Tuple7<_1, _2, _3, _4, _5, _6, _7Prime>>coerce()._7());
     }
 
@@ -215,8 +213,8 @@ public class Tuple7<_1, _2, _3, _4, _5, _6, _7> extends HCons<_1, Tuple6<_2, _3,
     public <_7Prime, App extends Applicative<?, App>,
             TravB extends Traversable<_7Prime, Tuple7<_1, _2, _3, _4, _5, _6, ?>>,
             AppB extends Applicative<_7Prime, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super _7, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super _7, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return fn.apply(_7).fmap(_7Prime -> fmap(constantly(_7Prime))).<TravB>fmap(Applicative::coerce).coerce();
     }
 

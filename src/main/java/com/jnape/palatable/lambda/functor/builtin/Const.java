@@ -7,7 +7,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * A (surprisingly useful) functor over some phantom type <code>B</code>, retaining a value of type <code>A</code> that
@@ -47,7 +46,7 @@ public final class Const<A, B> implements
      * @return a Const over A (the same value) and C (the new phantom parameter)
      */
     @Override
-    public <C> Const<A, C> fmap(Function<? super B, ? extends C> fn) {
+    public <C> Const<A, C> fmap(Fn1<? super B, ? extends C> fn) {
         return Monad.super.<C>fmap(fn).coerce();
     }
 
@@ -61,7 +60,7 @@ public final class Const<A, B> implements
      * {@inheritDoc}
      */
     @Override
-    public <C> Const<A, C> zip(Applicative<Function<? super B, ? extends C>, Const<A, ?>> appFn) {
+    public <C> Const<A, C> zip(Applicative<Fn1<? super B, ? extends C>, Const<A, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -70,7 +69,7 @@ public final class Const<A, B> implements
      */
     @Override
     public <C> Lazy<Const<A, C>> lazyZip(
-            Lazy<? extends Applicative<Function<? super B, ? extends C>, Const<A, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super B, ? extends C>, Const<A, ?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<C, Const<A, ?>>::coerce);
     }
 
@@ -95,7 +94,7 @@ public final class Const<A, B> implements
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <C> Const<A, C> flatMap(Function<? super B, ? extends Monad<C, Const<A, ?>>> f) {
+    public <C> Const<A, C> flatMap(Fn1<? super B, ? extends Monad<C, Const<A, ?>>> f) {
         return (Const<A, C>) this;
     }
 
@@ -105,24 +104,21 @@ public final class Const<A, B> implements
     @Override
     public <C, App extends Applicative<?, App>, TravB extends Traversable<C, Const<A, ?>>,
             AppB extends Applicative<C, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super B, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super B, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return pure.apply(coerce());
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <Z> Const<Z, B> biMapL(Fn1<? super A, ? extends Z> fn) {
-        return (Const<Z, B>) Bifunctor.super.biMapL(fn);
+        return (Const<Z, B>) Bifunctor.super.<Z>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -132,8 +128,6 @@ public final class Const<A, B> implements
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public <C, D> Const<C, D> biMap(Fn1<? super A, ? extends C> lFn,

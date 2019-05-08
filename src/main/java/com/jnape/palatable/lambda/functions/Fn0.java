@@ -41,12 +41,12 @@ public interface Fn0<A> extends Fn1<Unit, A>, Supplier<A>, Callable<A> {
     }
 
     @Override
-    default <B> Fn0<B> flatMap(Function<? super A, ? extends Monad<B, Fn1<Unit, ?>>> f) {
+    default <B> Fn0<B> flatMap(Fn1<? super A, ? extends Monad<B, Fn1<Unit, ?>>> f) {
         return Fn1.super.flatMap(f).thunk(UNIT);
     }
 
     @Override
-    default <B> Fn0<B> fmap(Function<? super A, ? extends B> f) {
+    default <B> Fn0<B> fmap(Fn1<? super A, ? extends B> f) {
         return Fn1.super.<B>fmap(f).thunk(UNIT);
     }
 
@@ -56,7 +56,7 @@ public interface Fn0<A> extends Fn1<Unit, A>, Supplier<A>, Callable<A> {
     }
 
     @Override
-    default <B> Fn0<B> zip(Applicative<Function<? super A, ? extends B>, Fn1<Unit, ?>> appFn) {
+    default <B> Fn0<B> zip(Applicative<Fn1<? super A, ? extends B>, Fn1<Unit, ?>> appFn) {
         return Fn1.super.zip(appFn).thunk(UNIT);
     }
 

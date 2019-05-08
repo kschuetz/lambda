@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 /**
  * The Kleisli arrow of a {@link Monad}, manifest as simply an <code>{@link Fn1}&lt;A, MB&gt;</code>. This can be
- * thought of as a fixed, portable {@link Monad#flatMap(Function)}.
+ * thought of as a fixed, portable {@link Monad#flatMap(Fn1)}.
  *
  * @param <A>  the input argument type
  * @param <M>  the {@link Monad} unification parameter

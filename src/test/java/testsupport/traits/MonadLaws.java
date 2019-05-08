@@ -32,7 +32,7 @@ public class MonadLaws<M extends Monad<?, M>> implements Trait<Monad<?, M>> {
     }
 
     private Maybe<String> testLeftIdentity(Monad<?, M> m) {
-        Object a = new Object();
+        Object                        a  = new Object();
         Fn1<Object, Monad<Object, M>> fn = id().andThen(m::pure);
         return m.pure(a).flatMap(fn).equals(fn.apply(a))
                ? nothing()
@@ -47,15 +47,15 @@ public class MonadLaws<M extends Monad<?, M>> implements Trait<Monad<?, M>> {
 
     private Maybe<String> testAssociativity(Monad<?, M> m) {
         Fn1<Object, Monad<Object, M>> f = constantly(m.pure(new Object()));
-        Function<Object, Monad<Object, M>> g = constantly(m.pure(new Object()));
+        Fn1<Object, Monad<Object, M>> g = constantly(m.pure(new Object()));
         return m.flatMap(f).flatMap(g).equals(m.flatMap(a -> f.apply(a).flatMap(g)))
                ? nothing()
                : just("associativity: (m.flatMap(f).flatMap(g).equals(m.flatMap(a -> f.apply(a).flatMap(g))))");
     }
 
     private Maybe<String> testJoin(Monad<?, M> m) {
-        Monad<Monad<Object, M>, M> mma = m.pure(m.fmap(upcast()));
-        boolean equals = mma.flatMap(id()).equals(join(mma));
+        Monad<Monad<Object, M>, M> mma    = m.pure(m.fmap(upcast()));
+        boolean                    equals = mma.flatMap(id()).equals(join(mma));
         return equals
                ? nothing()
                : just("join: (m.pure(m).flatMap(id())).equals(Monad.join(m.pure(m)))");

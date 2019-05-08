@@ -99,7 +99,7 @@ public abstract class Either<L, R> implements
      * @return this if a left value or a right value that pred matches; otherwise, the result of leftSupplier wrapped in
      * a left
      */
-    public final Either<L, R> filter(Function<? super R, ? extends Boolean> pred, Supplier<L> leftSupplier) {
+    public final Either<L, R> filter(Fn1<? super R, ? extends Boolean> pred, Supplier<L> leftSupplier) {
         return filter(pred, __ -> leftSupplier.get());
     }
 
@@ -112,8 +112,8 @@ public abstract class Either<L, R> implements
      * @return this is a left value or a right value that pred matches; otherwise, the result of leftFn applied to the
      * right value, wrapped in a left
      */
-    public final Either<L, R> filter(Function<? super R, ? extends Boolean> pred,
-                                     Function<? super R, ? extends L> leftFn) {
+    public final Either<L, R> filter(Fn1<? super R, ? extends Boolean> pred,
+                                     Fn1<? super R, ? extends L> leftFn) {
         return flatMap(r -> pred.apply(r) ? right(r) : left(leftFn.apply(r)));
     }
 
@@ -130,7 +130,7 @@ public abstract class Either<L, R> implements
      */
     @Override
     @SuppressWarnings("RedundantTypeArguments")
-    public <R2> Either<L, R2> flatMap(Function<? super R, ? extends Monad<R2, Either<L, ?>>> rightFn) {
+    public <R2> Either<L, R2> flatMap(Fn1<? super R, ? extends Monad<R2, Either<L, ?>>> rightFn) {
         return match(Either::left, rightFn.andThen(Monad<R2, Either<L, ?>>::coerce));
     }
 
@@ -207,37 +207,28 @@ public abstract class Either<L, R> implements
      * {@inheritDoc}
      */
     @Override
-    public final <R2> Either<L, R2> fmap(Function<? super R, ? extends R2> fn) {
+    public final <R2> Either<L, R2> fmap(Fn1<? super R, ? extends R2> fn) {
         return Monad.super.<R2>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <L2> Either<L2, R> biMapL(Fn1<? super L, ? extends L2> fn) {
-        return (Either<L2, R>) Bifunctor.super.biMapL(fn);
+        return (Either<L2, R>) Bifunctor.super.<L2>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <R2> Either<L, R2> biMapR(Fn1<? super R, ? extends R2> fn) {
-        return (Either<L, R2>) Bifunctor.super.biMapR(fn);
+        return (Either<L, R2>) Bifunctor.super.<R2>biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @param leftFn
-     * @param rightFn
      */
     @Override
     public final <L2, R2> Either<L2, R2> biMap(Fn1<? super L, ? extends L2> leftFn,
@@ -257,7 +248,7 @@ public abstract class Either<L, R> implements
      * {@inheritDoc}
      */
     @Override
-    public final <R2> Either<L, R2> zip(Applicative<Function<? super R, ? extends R2>, Either<L, ?>> appFn) {
+    public final <R2> Either<L, R2> zip(Applicative<Fn1<? super R, ? extends R2>, Either<L, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -266,7 +257,7 @@ public abstract class Either<L, R> implements
      */
     @Override
     public <R2> Lazy<Either<L, R2>> lazyZip(
-            Lazy<? extends Applicative<Function<? super R, ? extends R2>, Either<L, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super R, ? extends R2>, Either<L, ?>>> lazyAppFn) {
         return match(l -> lazy(left(l)),
                      r -> lazyAppFn.fmap(eitherLF -> eitherLF.<R2>fmap(f -> f.apply(r)).coerce()));
     }
@@ -294,8 +285,8 @@ public abstract class Either<L, R> implements
     @SuppressWarnings("unchecked")
     public final <R2, App extends Applicative<?, App>, TravB extends Traversable<R2, Either<L, ?>>,
             AppB extends Applicative<R2, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super R, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super R, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return (AppTrav) match(l -> pure.apply((TravB) left(l)), r -> fn.apply(r).fmap(Either::right));
     }
 

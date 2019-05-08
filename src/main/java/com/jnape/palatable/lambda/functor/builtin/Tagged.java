@@ -6,8 +6,6 @@ import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Cocartesian;
 import com.jnape.palatable.lambda.monad.Monad;
 
-import java.util.function.Function;
-
 import static com.jnape.palatable.lambda.adt.choice.Choice2.b;
 
 /**
@@ -37,7 +35,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <C> Tagged<S, C> flatMap(Function<? super B, ? extends Monad<C, Tagged<S, ?>>> f) {
+    public <C> Tagged<S, C> flatMap(Fn1<? super B, ? extends Monad<C, Tagged<S, ?>>> f) {
         return f.apply(b).coerce();
     }
 
@@ -53,7 +51,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <C> Tagged<S, C> fmap(Function<? super B, ? extends C> fn) {
+    public <C> Tagged<S, C> fmap(Fn1<? super B, ? extends C> fn) {
         return Monad.super.<C>fmap(fn).coerce();
     }
 
@@ -61,7 +59,7 @@ public final class Tagged<S, B> implements Monad<B, Tagged<S, ?>>, Cocartesian<S
      * {@inheritDoc}
      */
     @Override
-    public <C> Tagged<S, C> zip(Applicative<Function<? super B, ? extends C>, Tagged<S, ?>> appFn) {
+    public <C> Tagged<S, C> zip(Applicative<Fn1<? super B, ? extends C>, Tagged<S, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 

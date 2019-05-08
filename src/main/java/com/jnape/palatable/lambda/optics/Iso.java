@@ -13,8 +13,6 @@ import com.jnape.palatable.lambda.optics.functions.Over;
 import com.jnape.palatable.lambda.optics.functions.Set;
 import com.jnape.palatable.lambda.optics.functions.View;
 
-import java.util.function.Function;
-
 import static com.jnape.palatable.lambda.functions.Fn1.fn1;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
@@ -97,7 +95,7 @@ public interface Iso<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Iso<S, U, A, B> fmap(Function<? super T, ? extends U> fn) {
+    default <U> Iso<S, U, A, B> fmap(Fn1<? super T, ? extends U> fn) {
         return Monad.super.<U>fmap(fn).coerce();
     }
 
@@ -113,7 +111,7 @@ public interface Iso<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Iso<S, U, A, B> zip(Applicative<Function<? super T, ? extends U>, Iso<S, ?, A, B>> appFn) {
+    default <U> Iso<S, U, A, B> zip(Applicative<Fn1<? super T, ? extends U>, Iso<S, ?, A, B>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -137,7 +135,7 @@ public interface Iso<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Iso<S, U, A, B> flatMap(Function<? super T, ? extends Monad<U, Iso<S, ?, A, B>>> fn) {
+    default <U> Iso<S, U, A, B> flatMap(Fn1<? super T, ? extends Monad<U, Iso<S, ?, A, B>>> fn) {
         //noinspection RedundantTypeArguments
         return unIso().fmap(bt -> Fn2.<B, B, U>fn2(
                 fn1(bt.andThen(fn.<Iso<S, U, A, B>>andThen(Monad<U, Iso<S, ?, A, B>>::coerce))

@@ -6,6 +6,7 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.adt.hlist.HList;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn0;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.Peek;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.Functor;
@@ -127,7 +128,7 @@ public abstract class Maybe<A> implements
      * {@link Maybe#nothing}.
      */
     @Override
-    public final <B> Maybe<B> fmap(Function<? super A, ? extends B> fn) {
+    public final <B> Maybe<B> fmap(Fn1<? super A, ? extends B> fn) {
         return Monad.super.<B>fmap(fn).coerce();
     }
 
@@ -135,7 +136,7 @@ public abstract class Maybe<A> implements
      * {@inheritDoc}
      */
     @Override
-    public final <B> Maybe<B> zip(Applicative<Function<? super A, ? extends B>, Maybe<?>> appFn) {
+    public final <B> Maybe<B> zip(Applicative<Fn1<? super A, ? extends B>, Maybe<?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -147,8 +148,7 @@ public abstract class Maybe<A> implements
      * @return the zipped {@link Maybe}
      */
     @Override
-    public <B> Lazy<Maybe<B>> lazyZip(
-            Lazy<? extends Applicative<Function<? super A, ? extends B>, Maybe<?>>> lazyAppFn) {
+    public <B> Lazy<Maybe<B>> lazyZip(Lazy<? extends Applicative<Fn1<? super A, ? extends B>, Maybe<?>>> lazyAppFn) {
         return match(constantly(lazy(nothing())),
                      a -> lazyAppFn.fmap(maybeF -> maybeF.<B>fmap(f -> f.apply(a)).coerce()));
     }
@@ -174,7 +174,7 @@ public abstract class Maybe<A> implements
      */
     @SuppressWarnings("RedundantTypeArguments")
     @Override
-    public final <B> Maybe<B> flatMap(Function<? super A, ? extends Monad<B, Maybe<?>>> f) {
+    public final <B> Maybe<B> flatMap(Fn1<? super A, ? extends Monad<B, Maybe<?>>> f) {
         return match(constantly(nothing()), f.andThen(Monad<B, Maybe<?>>::coerce));
     }
 
@@ -216,8 +216,8 @@ public abstract class Maybe<A> implements
     @SuppressWarnings("unchecked")
     public final <B, App extends Applicative<?, App>, TravB extends Traversable<B, Maybe<?>>,
             AppB extends Applicative<B, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super A, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super A, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(__ -> pure.apply((TravB) Maybe.<B>nothing()), a -> (AppTrav) fn.apply(a).fmap(Maybe::just));
     }
 

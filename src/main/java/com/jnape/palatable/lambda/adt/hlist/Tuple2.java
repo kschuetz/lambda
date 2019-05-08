@@ -10,7 +10,6 @@ import com.jnape.palatable.lambda.monad.Monad;
 import com.jnape.palatable.lambda.traversable.Traversable;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 
@@ -78,7 +77,7 @@ public class Tuple2<_1, _2> extends HCons<_1, SingletonHList<_2>> implements
     }
 
     @Override
-    public <_2Prime> Tuple2<_1, _2Prime> fmap(Function<? super _2, ? extends _2Prime> fn) {
+    public <_2Prime> Tuple2<_1, _2Prime> fmap(Fn1<? super _2, ? extends _2Prime> fn) {
         return Monad.super.<_2Prime>fmap(fn).coerce();
     }
 
@@ -107,13 +106,13 @@ public class Tuple2<_1, _2> extends HCons<_1, SingletonHList<_2>> implements
 
     @Override
     public <_2Prime> Tuple2<_1, _2Prime> zip(
-            Applicative<Function<? super _2, ? extends _2Prime>, Tuple2<_1, ?>> appFn) {
+            Applicative<Fn1<? super _2, ? extends _2Prime>, Tuple2<_1, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
     @Override
     public <_2Prime> Lazy<Tuple2<_1, _2Prime>> lazyZip(
-            Lazy<? extends Applicative<Function<? super _2, ? extends _2Prime>, Tuple2<_1, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super _2, ? extends _2Prime>, Tuple2<_1, ?>>> lazyAppFn) {
         return Monad.super.lazyZip(lazyAppFn).fmap(Monad<_2Prime, Tuple2<_1, ?>>::coerce);
     }
 
@@ -128,15 +127,15 @@ public class Tuple2<_1, _2> extends HCons<_1, SingletonHList<_2>> implements
     }
 
     @Override
-    public <_2Prime> Tuple2<_1, _2Prime> flatMap(Function<? super _2, ? extends Monad<_2Prime, Tuple2<_1, ?>>> f) {
+    public <_2Prime> Tuple2<_1, _2Prime> flatMap(Fn1<? super _2, ? extends Monad<_2Prime, Tuple2<_1, ?>>> f) {
         return pure(f.apply(_2).<Tuple2<_1, _2Prime>>coerce()._2());
     }
 
     @Override
     public <_2Prime, App extends Applicative<?, App>, TravB extends Traversable<_2Prime, Tuple2<_1, ?>>,
             AppB extends Applicative<_2Prime, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super _2, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super _2, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return fn.apply(_2).fmap(_2Prime -> fmap(constantly(_2Prime))).<TravB>fmap(Applicative::coerce).coerce();
     }
 

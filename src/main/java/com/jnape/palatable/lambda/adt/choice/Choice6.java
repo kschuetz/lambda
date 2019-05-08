@@ -74,13 +74,12 @@ public abstract class Choice6<A, B, C, D, E, F> implements
      * {@inheritDoc}
      */
     @Override
-    public <G> Choice6<A, B, C, D, E, G> fmap(Function<? super F, ? extends G> fn) {
+    public <G> Choice6<A, B, C, D, E, G> fmap(Fn1<? super F, ? extends G> fn) {
         return Monad.super.<G>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -90,7 +89,6 @@ public abstract class Choice6<A, B, C, D, E, F> implements
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -100,8 +98,6 @@ public abstract class Choice6<A, B, C, D, E, F> implements
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public <G, H> Choice6<A, B, C, D, G, H> biMap(Fn1<? super E, ? extends G> lFn,
@@ -122,7 +118,7 @@ public abstract class Choice6<A, B, C, D, E, F> implements
      */
     @Override
     public <G> Choice6<A, B, C, D, E, G> zip(
-            Applicative<Function<? super F, ? extends G>, Choice6<A, B, C, D, E, ?>> appFn) {
+            Applicative<Fn1<? super F, ? extends G>, Choice6<A, B, C, D, E, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -131,7 +127,7 @@ public abstract class Choice6<A, B, C, D, E, F> implements
      */
     @Override
     public <G> Lazy<Choice6<A, B, C, D, E, G>> lazyZip(
-            Lazy<? extends Applicative<Function<? super F, ? extends G>, Choice6<A, B, C, D, E, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super F, ? extends G>, Choice6<A, B, C, D, E, ?>>> lazyAppFn) {
         return match(a -> lazy(a(a)),
                      b -> lazy(b(b)),
                      c -> lazy(c(c)),
@@ -160,8 +156,7 @@ public abstract class Choice6<A, B, C, D, E, F> implements
      * {@inheritDoc}
      */
     @Override
-    public <G> Choice6<A, B, C, D, E, G> flatMap(
-            Function<? super F, ? extends Monad<G, Choice6<A, B, C, D, E, ?>>> fn) {
+    public <G> Choice6<A, B, C, D, E, G> flatMap(Fn1<? super F, ? extends Monad<G, Choice6<A, B, C, D, E, ?>>> fn) {
         return match(Choice6::a, Choice6::b, Choice6::c, Choice6::d, Choice6::e, f -> fn.apply(f).coerce());
     }
 
@@ -172,8 +167,8 @@ public abstract class Choice6<A, B, C, D, E, F> implements
     @SuppressWarnings("unchecked")
     public <G, App extends Applicative<?, App>, TravB extends Traversable<G, Choice6<A, B, C, D, E, ?>>,
             AppB extends Applicative<G, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super F, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super F, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) Choice6.<A, B, C, D, E, G>a(a)).coerce(),
                      b -> pure.apply((TravB) Choice6.<A, B, C, D, E, G>b(b)).coerce(),
                      c -> pure.apply((TravB) Choice6.<A, B, C, D, E, G>c(c)),

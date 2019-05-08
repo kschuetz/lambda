@@ -148,7 +148,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Lens<S, U, A, B> fmap(Function<? super T, ? extends U> fn) {
+    default <U> Lens<S, U, A, B> fmap(Fn1<? super T, ? extends U> fn) {
         return Monad.super.<U>fmap(fn).coerce();
     }
 
@@ -164,7 +164,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Lens<S, U, A, B> zip(Applicative<Function<? super T, ? extends U>, Lens<S, ?, A, B>> appFn) {
+    default <U> Lens<S, U, A, B> zip(Applicative<Fn1<? super T, ? extends U>, Lens<S, ?, A, B>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -188,7 +188,7 @@ public interface Lens<S, T, A, B> extends
      * {@inheritDoc}
      */
     @Override
-    default <U> Lens<S, U, A, B> flatMap(Function<? super T, ? extends Monad<U, Lens<S, ?, A, B>>> f) {
+    default <U> Lens<S, U, A, B> flatMap(Fn1<? super T, ? extends Monad<U, Lens<S, ?, A, B>>> f) {
 
         return lens(view(this), (s, b) -> set(f.apply(set(this, b, s)).<Lens<S, U, A, B>>coerce(), b, s));
     }

@@ -67,34 +67,28 @@ public abstract class Choice2<A, B> implements
      * {@inheritDoc}
      */
     @Override
-    public final <C> Choice2<A, C> fmap(Function<? super B, ? extends C> fn) {
+    public final <C> Choice2<A, C> fmap(Fn1<? super B, ? extends C> fn) {
         return Monad.super.<C>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <C> Choice2<C, B> biMapL(Fn1<? super A, ? extends C> fn) {
-        return (Choice2<C, B>) Bifunctor.super.biMapL(fn);
+        return (Choice2<C, B>) Bifunctor.super.<C>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <C> Choice2<A, C> biMapR(Fn1<? super B, ? extends C> fn) {
-        return (Choice2<A, C>) Bifunctor.super.biMapR(fn);
+        return (Choice2<A, C>) Bifunctor.super.<C>biMapR(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param lFn
-     * @param rFn
      */
     @Override
     public final <C, D> Choice2<C, D> biMap(Fn1<? super A, ? extends C> lFn,
@@ -114,7 +108,7 @@ public abstract class Choice2<A, B> implements
      * {@inheritDoc}
      */
     @Override
-    public <C> Choice2<A, C> zip(Applicative<Function<? super B, ? extends C>, Choice2<A, ?>> appFn) {
+    public <C> Choice2<A, C> zip(Applicative<Fn1<? super B, ? extends C>, Choice2<A, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -123,7 +117,7 @@ public abstract class Choice2<A, B> implements
      */
     @Override
     public <C> Lazy<? extends Monad<C, Choice2<A, ?>>> lazyZip(
-            Lazy<? extends Applicative<Function<? super B, ? extends C>, Choice2<A, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super B, ? extends C>, Choice2<A, ?>>> lazyAppFn) {
         return match(a -> lazy(a(a)),
                      b -> lazyAppFn.fmap(choiceF -> choiceF.<C>fmap(f -> f.apply(b)).coerce()));
     }
@@ -148,7 +142,7 @@ public abstract class Choice2<A, B> implements
      * {@inheritDoc}
      */
     @Override
-    public final <C> Choice2<A, C> flatMap(Function<? super B, ? extends Monad<C, Choice2<A, ?>>> f) {
+    public final <C> Choice2<A, C> flatMap(Fn1<? super B, ? extends Monad<C, Choice2<A, ?>>> f) {
         return match(Choice2::a, b -> f.apply(b).coerce());
     }
 
@@ -159,8 +153,8 @@ public abstract class Choice2<A, B> implements
     @SuppressWarnings("unchecked")
     public <C, App extends Applicative<?, App>, TravB extends Traversable<C, Choice2<A, ?>>,
             AppB extends Applicative<C, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super B, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super B, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) a(a)),
                      b -> fn.apply(b).<Choice2<A, C>>fmap(Choice2::b).<TravB>fmap(Functor::coerce).coerce());
     }

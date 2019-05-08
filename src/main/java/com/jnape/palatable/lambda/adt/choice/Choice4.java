@@ -71,28 +71,24 @@ public abstract class Choice4<A, B, C, D> implements
      * {@inheritDoc}
      */
     @Override
-    public final <E> Choice4<A, B, C, E> fmap(Function<? super D, ? extends E> fn) {
+    public final <E> Choice4<A, B, C, E> fmap(Fn1<? super D, ? extends E> fn) {
         return Monad.super.<E>fmap(fn).coerce();
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <E> Choice4<A, B, E, D> biMapL(Fn1<? super C, ? extends E> fn) {
-        return (Choice4<A, B, E, D>) Bifunctor.super.biMapL(fn);
+        return (Choice4<A, B, E, D>) Bifunctor.super.<E>biMapL(fn);
     }
 
     /**
      * {@inheritDoc}
-     * @param fn
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final <E> Choice4<A, B, C, E> biMapR(Fn1<? super D, ? extends E> fn) {
-        return (Choice4<A, B, C, E>) Bifunctor.super.biMapR(fn);
+        return (Choice4<A, B, C, E>) Bifunctor.super.<E>biMapR(fn);
     }
 
     @Override
@@ -113,7 +109,7 @@ public abstract class Choice4<A, B, C, D> implements
      * {@inheritDoc}
      */
     @Override
-    public <E> Choice4<A, B, C, E> zip(Applicative<Function<? super D, ? extends E>, Choice4<A, B, C, ?>> appFn) {
+    public <E> Choice4<A, B, C, E> zip(Applicative<Fn1<? super D, ? extends E>, Choice4<A, B, C, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -122,7 +118,7 @@ public abstract class Choice4<A, B, C, D> implements
      */
     @Override
     public <E> Lazy<Choice4<A, B, C, E>> lazyZip(
-            Lazy<? extends Applicative<Function<? super D, ? extends E>, Choice4<A, B, C, ?>>> lazyAppFn) {
+            Lazy<? extends Applicative<Fn1<? super D, ? extends E>, Choice4<A, B, C, ?>>> lazyAppFn) {
         return match(a -> lazy(a(a)),
                      b -> lazy(b(b)),
                      c -> lazy(c(c)),
@@ -149,7 +145,7 @@ public abstract class Choice4<A, B, C, D> implements
      * {@inheritDoc}
      */
     @Override
-    public <E> Choice4<A, B, C, E> flatMap(Function<? super D, ? extends Monad<E, Choice4<A, B, C, ?>>> f) {
+    public <E> Choice4<A, B, C, E> flatMap(Fn1<? super D, ? extends Monad<E, Choice4<A, B, C, ?>>> f) {
         return match(Choice4::a, Choice4::b, Choice4::c, d -> f.apply(d).coerce());
     }
 
@@ -160,8 +156,8 @@ public abstract class Choice4<A, B, C, D> implements
     @SuppressWarnings("unchecked")
     public <E, App extends Applicative<?, App>, TravB extends Traversable<E, Choice4<A, B, C, ?>>,
             AppB extends Applicative<E, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super D, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super D, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(a -> pure.apply((TravB) Choice4.<A, B, C, E>a(a)).coerce(),
                      b -> pure.apply((TravB) Choice4.<A, B, C, E>b(b)).coerce(),
                      c -> pure.apply((TravB) Choice4.<A, B, C, E>c(c)),

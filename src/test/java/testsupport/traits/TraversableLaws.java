@@ -2,6 +2,7 @@ package testsupport.traits;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Applicative;
 import com.jnape.palatable.lambda.functor.builtin.Compose;
 import com.jnape.palatable.lambda.functor.builtin.Identity;
@@ -30,16 +31,19 @@ public class TraversableLaws<Trav extends Traversable<?, Trav>> implements Trait
                                this::testComposition)
                 )
                 .peek(s -> {
-                    throw new AssertionError("The following Traversable laws did not hold for instance of " + traversable.getClass() + ": \n\t - " + s);
+                    throw new AssertionError("The following Traversable laws did not hold for instance of "
+                                                     + traversable.getClass() + ": \n\t - " + s);
                 });
     }
 
     private Maybe<String> testNaturality(Traversable<?, Trav> trav) {
-        Function<Object, Identity<Object>> f = Identity::new;
-        Function<Identity<Object>, Either<String, Object>> t = id -> right(id.runIdentity());
+        Fn1<Object, Identity<Object>>                 f = Identity::new;
+        Fn1<Identity<Object>, Either<String, Object>> t = id -> right(id.runIdentity());
 
-        Function<Traversable<Object, Trav>, Applicative<Traversable<Object, Trav>, Identity<?>>> pureFn = x -> new Identity<>(x);
-        Function<Traversable<Object, Trav>, Applicative<Traversable<Object, Trav>, Either<String, ?>>> pureFn2 = x -> right(x);
+        Fn1<Traversable<Object, Trav>, Applicative<Traversable<Object, Trav>, Identity<?>>> pureFn =
+                x -> new Identity<>(x);
+        Fn1<Traversable<Object, Trav>, Applicative<Traversable<Object, Trav>, Either<String, ?>>> pureFn2 =
+                x -> right(x);
 
         return t.apply(trav.traverse(f, pureFn).<Object>fmap(id()).coerce())
                        .equals(trav.traverse(t.compose(f), pureFn2).<Object>fmap(id()).coerce())
@@ -55,8 +59,8 @@ public class TraversableLaws<Trav extends Traversable<?, Trav>> implements Trait
     }
 
     private Maybe<String> testComposition(Traversable<?, Trav> trav) {
-        Function<Object, Identity<Object>> f = Identity::new;
-        Function<Object, Applicative<Object, Identity<?>>> g = x -> new Identity<>(x);
+        Fn1<Object, Identity<Object>>                 f = Identity::new;
+        Fn1<Object, Applicative<Object, Identity<?>>> g = x -> new Identity<>(x);
 
         return trav.traverse(f.andThen(x -> x.fmap(g)).andThen(Compose::new), x -> new Compose<>(new Identity<>(new Identity<>(x))))
                        .equals(new Compose<>(trav.traverse(f, x -> new Identity<>(x)).fmap(t -> t.traverse(g, x -> new Identity<>(x)))))

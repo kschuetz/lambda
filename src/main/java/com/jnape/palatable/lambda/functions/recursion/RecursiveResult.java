@@ -48,8 +48,7 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
     }
 
     @Override
-    public <C> RecursiveResult<A, C> flatMap(
-            Function<? super B, ? extends Monad<C, RecursiveResult<A, ?>>> f) {
+    public <C> RecursiveResult<A, C> flatMap(Fn1<? super B, ? extends Monad<C, RecursiveResult<A, ?>>> f) {
         return match(RecursiveResult::recurse, b -> f.apply(b).coerce());
     }
 
@@ -59,13 +58,12 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
     }
 
     @Override
-    public <C> RecursiveResult<A, C> fmap(Function<? super B, ? extends C> fn) {
+    public <C> RecursiveResult<A, C> fmap(Fn1<? super B, ? extends C> fn) {
         return Monad.super.<C>fmap(fn).coerce();
     }
 
     @Override
-    public <C> RecursiveResult<A, C> zip(
-            Applicative<Function<? super B, ? extends C>, RecursiveResult<A, ?>> appFn) {
+    public <C> RecursiveResult<A, C> zip(Applicative<Fn1<? super B, ? extends C>, RecursiveResult<A, ?>> appFn) {
         return Monad.super.zip(appFn).coerce();
     }
 
@@ -82,8 +80,8 @@ public abstract class RecursiveResult<A, B> implements CoProduct2<A, B, Recursiv
     @Override
     public <C, App extends Applicative<?, App>, TravB extends Traversable<C, RecursiveResult<A, ?>>,
             AppB extends Applicative<C, App>,
-            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Function<? super B, ? extends AppB> fn,
-                                                                      Function<? super TravB, ? extends AppTrav> pure) {
+            AppTrav extends Applicative<TravB, App>> AppTrav traverse(Fn1<? super B, ? extends AppB> fn,
+                                                                      Fn1<? super TravB, ? extends AppTrav> pure) {
         return match(__ -> pure.apply(coerce()),
                      b -> fn.apply(b).fmap(this::pure).<TravB>fmap(RecursiveResult::coerce).coerce());
     }
