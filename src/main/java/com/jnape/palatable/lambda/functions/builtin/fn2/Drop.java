@@ -2,7 +2,8 @@ package com.jnape.palatable.lambda.functions.builtin.fn2;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
-import com.jnape.palatable.lambda.internal.iteration.DroppingIterable;
+
+import static com.jnape.palatable.lambda.internal.iteration.SplicingIterable.splicingIterable;
 
 /**
  * Lazily skip the first <code>n</code> elements from an <code>Iterable</code> by returning an <code>Iterable</code>
@@ -22,7 +23,8 @@ public final class Drop<A> implements Fn2<Integer, Iterable<A>, Iterable<A>> {
 
     @Override
     public Iterable<A> checkedApply(Integer n, Iterable<A> as) {
-        return new DroppingIterable<>(n, as);
+        return splicingIterable(as).drop(n);
+//        return new DroppingIterable<>(n, as);
     }
 
     @SuppressWarnings("unchecked")

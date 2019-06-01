@@ -11,9 +11,7 @@ import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
 import static com.jnape.palatable.lambda.functions.builtin.fn3.FoldRight.foldRight;
 import static com.jnape.palatable.lambda.functor.builtin.Lazy.lazy;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ConsingIteratorTest {
 
