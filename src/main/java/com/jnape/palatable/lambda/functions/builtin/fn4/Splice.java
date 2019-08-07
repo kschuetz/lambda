@@ -4,7 +4,8 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
-import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
+
+import static com.jnape.palatable.lambda.internal.iteration.SplicingIterable.splicingIterable;
 
 /**
  * Return an {@link Iterable} that is the result of splicing all of the elements of an {@link Iterable} into
@@ -26,7 +27,8 @@ public final class Splice<A> implements Fn4<Integer, Integer, Iterable<A>, Itera
 
     @Override
     public Iterable<A> checkedApply(Integer startIndex, Integer replaceCount, Iterable<A> replacement, Iterable<A> original) {
-        return () -> new SplicingIterator<>(startIndex, replaceCount, replacement.iterator(), original.iterator());
+        //return () -> new SplicingIterator<>(startIndex, replaceCount, replacement.iterator(), original.iterator());
+        return splicingIterable(original).splice(startIndex, replaceCount, replacement);
     }
 
     @SuppressWarnings("unchecked")

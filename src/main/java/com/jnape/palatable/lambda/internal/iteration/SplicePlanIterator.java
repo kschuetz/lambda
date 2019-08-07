@@ -10,12 +10,11 @@ public final class SplicePlanIterator<A> extends ImmutableIterator<A> {
     private final Iterator<SpliceSegment<Integer>> segmentIterator;
     private final ArrayList<Iterator<A>> sourceIterators;
 
-    public SplicePlanIterator(Iterable<Iterable<A>> sources, Iterator<SpliceSegment<Integer>> segmentIterator, SplicePlan<A> splicePlan) {
+    public SplicePlanIterator(Iterable<Iterable<A>> sources, Iterator<SpliceSegment<Integer>> segmentIterator) {
         this.sources = toCollection(ArrayList::new, sources);
         this.segmentIterator = segmentIterator;
         sourceIterators = new ArrayList<>(this.sources.size());
     }
-
 
     @Override
     public boolean hasNext() {
