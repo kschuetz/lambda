@@ -3,73 +3,62 @@ package com.jnape.palatable.lambda.internal.iteration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static java.lang.Math.max;
+public class SplicingIterator<A> implements Iterator<A> {
+    private SpliceSourceState<A> state;
+    private A cache;
+    private boolean cached;
 
-public final class SplicingIterator<A> extends ImmutableIterator<A> {
-    private enum Phase {FRONT, SPLICE, BACK}
-
-    private final Iterator<A> original;
-    private final Iterator<A> replacement;
-    private final int startIndex;
-    private int replaceCount;
-    private Phase phase;
-    private int currentIndex;
-    private A nextElement;
-
-    public SplicingIterator(int startIndex, int replaceCount, Iterator<A> replacement, Iterator<A> original) {
-        this.original = original;
-        this.replacement = replacement;
-        this.startIndex = max(0, startIndex);
-        this.replaceCount = max(0, replaceCount);
-        this.phase = Phase.FRONT;
-        this.currentIndex = 0;
+    public SplicingIterator(SpliceSourceState<A> state) {
+        this.state = state;
     }
 
     @Override
     public boolean hasNext() {
-        if (nextElement == null) {
-            nextElement = readNextElement();
+        if (cached) {
+            return true;
+        } else {
+            cached = computeNext();
+            return cached;
         }
-        return nextElement != null;
     }
 
     @Override
     public A next() {
         if (hasNext()) {
-            A result = nextElement;
-            nextElement = null;
+            cached = false;
+            A result = cache;
+            cache = null;
             return result;
         } else {
             throw new NoSuchElementException();
         }
     }
 
-    private A readNextElement() {
-        if (phase == Phase.FRONT) {
-            if (currentIndex < startIndex && original.hasNext()) {
-                currentIndex++;
-                return original.next();
-            } else {
-                phase = Phase.SPLICE;
-            }
+    private boolean computeNext() {
+        if (state == null) {
+            return false;
         }
 
-        if (phase == Phase.SPLICE) {
-            if (replacement.hasNext()) {
-                return replacement.next();
-            } else {
-                while (original.hasNext() && replaceCount > 0) {
-                    original.next();
-                    replaceCount--;
+        SpliceSourceState<A> prev = null;
+        SpliceSourceState<A> current = state;
+
+        while (state != null && state.getStartOffset() > 0) {
+            state.setStartOffset(state.getStartOffset() - 1);
+            prev = state;
+            state = state.getNext();
+        }
+
+        if (state != null) {
+            if (state.getStartOffset() == 0) {
+                if (state.getSource().hasNext()) {
+                    cache = state.getSource().next();
+                    return true;
                 }
-                phase = Phase.BACK;
             }
+
+
         }
 
-        if (original.hasNext()) {
-            return original.next();
-        } else {
-            return null;
-        }
+        return false;
     }
 }
