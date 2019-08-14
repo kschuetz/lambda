@@ -42,4 +42,10 @@ public class SpliceSourceState<A> {
     public void setNext(SpliceSourceState<A> next) {
         this.next = next;
     }
+
+    @Override
+    public String toString() {
+        return "[" + startOffset + ":" + replaceCount + ":" + (source.hasNext() ? "+" : "_")
+                + "] ";
+    }
 }

@@ -44,8 +44,11 @@ public class SplicingIterator<A> implements Iterator<A> {
         SpliceSourceState<A> current = state;
 
         while (current != null) {
+            dumpState(state, "  state = ");
+            dumpState(current, "  current = ");
             int startOffset = current.getStartOffset();
             if (startOffset > 0) {
+                System.out.println("  s: " + startOffset);
                 current.decStartOffset();
                 prev = current;
                 current = current.getNext();
@@ -53,13 +56,25 @@ public class SplicingIterator<A> implements Iterator<A> {
             }
             // startOffset is 0
             Iterator<A> source = current.getSource();
-            while (skipCount > 0 && source.hasNext()) {
-                source.next();
+//            while (skipCount > 0 && source.hasNext()) {
+//
+//                A skippedValue = source.next();
+//                System.out.println("  skip " + skipCount + "; skipped " + skippedValue);
+//                skipCount -= 1;
+//            }
+            if (skipCount > 0 && source.hasNext()) {
+
+                A skippedValue = source.next();
+                System.out.println("  skip " + skipCount + "; skipped " + skippedValue);
                 skipCount -= 1;
+                prev = null;
+                current = state;
+                continue;
             }
 
             if (source.hasNext()) {
                 cache = source.next();
+                dumpState(state, "Yielding " + cache + ": ");
                 return true;
             } else {
                 skipCount += current.getReplaceCount();
@@ -73,7 +88,9 @@ public class SplicingIterator<A> implements Iterator<A> {
                 current = next;
 
                 if (current == null) {
+                    skipCount = 0;
                     state = normalizeStates(state);
+                    prev = null;
                     current = state;
                 }
             }
@@ -98,5 +115,19 @@ public class SplicingIterator<A> implements Iterator<A> {
             current = current.getNext();
         }
         return first;
+    }
+
+    private static <A> void dumpState(SpliceSourceState<A> state, String message) {
+        System.out.print(message);
+        SpliceSourceState<A> current = state;
+        while (current != null) {
+            System.out.print(current);
+            current = current.getNext();
+        }
+        System.out.println();
+    }
+
+    private static <A> void dumpState(SpliceSourceState<A> state) {
+        dumpState(state, "\n");
     }
 }
