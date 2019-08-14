@@ -39,26 +39,64 @@ public class SplicingIterator<A> implements Iterator<A> {
             return false;
         }
 
+        long skipCount = 0;
         SpliceSourceState<A> prev = null;
         SpliceSourceState<A> current = state;
 
-        while (state != null && state.getStartOffset() > 0) {
-            state.setStartOffset(state.getStartOffset() - 1);
-            prev = state;
-            state = state.getNext();
-        }
-
-        if (state != null) {
-            if (state.getStartOffset() == 0) {
-                if (state.getSource().hasNext()) {
-                    cache = state.getSource().next();
-                    return true;
-                }
+        while (current != null) {
+            int startOffset = current.getStartOffset();
+            if (startOffset > 0) {
+                current.decStartOffset();
+                prev = current;
+                current = current.getNext();
+                continue;
+            }
+            // startOffset is 0
+            Iterator<A> source = current.getSource();
+            while (skipCount > 0 && source.hasNext()) {
+                source.next();
+                skipCount -= 1;
             }
 
+            if (source.hasNext()) {
+                cache = source.next();
+                return true;
+            } else {
+                skipCount += current.getReplaceCount();
 
+                SpliceSourceState<A> next = current.getNext();
+                if (prev == null) {
+                    state = next;
+                } else {
+                    prev.setNext(next);
+                }
+                current = next;
+
+                if (current == null) {
+                    state = normalizeStates(state);
+                    current = state;
+                }
+            }
         }
 
         return false;
+    }
+
+    private static <A> SpliceSourceState<A> normalizeStates(SpliceSourceState<A> first) {
+        if (first == null) {
+            return null;
+        }
+        int minOffset = first.getStartOffset();
+        SpliceSourceState<A> current = first.getNext();
+        while (current != null) {
+            minOffset = Math.min(minOffset, current.getStartOffset());
+            current = current.getNext();
+        }
+        current = first;
+        while (current != null) {
+            current.setStartOffset(current.getStartOffset() - minOffset);
+            current = current.getNext();
+        }
+        return first;
     }
 }
