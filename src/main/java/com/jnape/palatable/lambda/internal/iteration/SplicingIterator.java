@@ -48,7 +48,9 @@ public class SplicingIterator<A> implements Iterator<A> {
             dumpState(current, "  current = ");
             int startOffset = current.getStartOffset();
             if (startOffset > 0) {
-                System.out.println("  s: " + startOffset);
+                if (debugging) {
+                    System.out.println("  s: " + startOffset);
+                }
                 current.decStartOffset();
                 prev = current;
                 current = current.getNext();
@@ -65,7 +67,9 @@ public class SplicingIterator<A> implements Iterator<A> {
             if (skipCount > 0 && source.hasNext()) {
 
                 A skippedValue = source.next();
-                System.out.println("  skip " + skipCount + "; skipped " + skippedValue);
+                if (debugging) {
+                    System.out.println("  skip " + skipCount + "; skipped " + skippedValue);
+                }
                 skipCount -= 1;
                 prev = null;
                 current = state;
@@ -88,7 +92,7 @@ public class SplicingIterator<A> implements Iterator<A> {
                 current = next;
 
                 if (current == null) {
-                    skipCount = 0;
+//                    skipCount = 0;
                     state = normalizeStates(state);
                     prev = null;
                     current = state;
@@ -103,6 +107,7 @@ public class SplicingIterator<A> implements Iterator<A> {
         if (first == null) {
             return null;
         }
+        dumpState(first, "** BEFORE NORMALIZE");
         int minOffset = first.getStartOffset();
         SpliceSourceState<A> current = first.getNext();
         while (current != null) {
@@ -114,10 +119,14 @@ public class SplicingIterator<A> implements Iterator<A> {
             current.setStartOffset(current.getStartOffset() - minOffset);
             current = current.getNext();
         }
+        dumpState(first, "** AFTER NORMALIZE");
         return first;
     }
 
     private static <A> void dumpState(SpliceSourceState<A> state, String message) {
+        if (!debugging) {
+            return;
+        }
         System.out.print(message);
         SpliceSourceState<A> current = state;
         while (current != null) {
@@ -130,4 +139,6 @@ public class SplicingIterator<A> implements Iterator<A> {
     private static <A> void dumpState(SpliceSourceState<A> state) {
         dumpState(state, "\n");
     }
+
+    public static boolean debugging = false;
 }

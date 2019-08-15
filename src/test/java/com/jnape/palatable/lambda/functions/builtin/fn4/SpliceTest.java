@@ -1,7 +1,6 @@
 package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import com.jnape.palatable.lambda.functions.builtin.fn2.ToCollection;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
 import org.junit.Test;
@@ -11,14 +10,17 @@ import testsupport.traits.FiniteIteration;
 import testsupport.traits.ImmutableIteration;
 import testsupport.traits.Laziness;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Repeat.repeat;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Drop.drop;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Iterate.iterate;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
 import static com.jnape.palatable.lambda.functions.builtin.fn4.Splice.splice;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThat;
 import static testsupport.matchers.IterableMatcher.iterates;
 
@@ -118,24 +120,41 @@ public class SpliceTest {
         List<Integer> list6 = asList(35, 36, 37, 38);
         List<Integer> list7 = asList(39, 40);
 
-        System.out.println("----------");
         Iterable<Integer> result1 = splice(4, 0, list2, list1);
-        //System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result1));
         assertThat(result1, iterates(1, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
-        System.out.println("---- START ----");
         Iterable<Integer> result2 = splice(3, 1, list3, result1);
-        System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result2));
-        assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
+        assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
+                10));
 
-//        Iterable<Integer> result3 = splice(2, 2, list4, result2);
-//        System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result3));
-//        Iterable<Integer> result4 = splice(1, 3, list5, result3);
-//        System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result4));
-//        Iterable<Integer> result5 = splice(0, 4, list6, result4);
-//        System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result5));
-//        Iterable<Integer> result6 = splice(100, 100, list7, result5);
-//        System.out.println(ToCollection.<Integer, ArrayList<Integer>>toCollection(ArrayList::new, result6));
+        Iterable<Integer> result3 = splice(2, 2, list4, result2);
+        assertThat(result3, iterates(1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                5, 6, 7, 8, 9, 10));
 
+        Iterable<Integer> result4 = splice(1, 3, list5, result3);
+        assertThat(result4, iterates(1, 31, 32, 33, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10));
+
+        Iterable<Integer> result5 = splice(0, 4, list6, result4);
+        assertThat(result5, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10));
+
+        Iterable<Integer> result6 = splice(200, 100, list7, result5);
+        assertThat(result6, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10, 39, 40));
+
+        Iterable<Integer> result7 = splice(1, 28, emptyList(), result6);
+        assertThat(result7, iterates(35, 40));
+    }
+
+    @Test
+    public void stackSafety() {
+        final int COUNT = 10_000;
+        Iterable<Integer> subject = iterate(acc -> acc + 1, 0);
+        for (int i = 0; i <= COUNT; i++) {
+            subject = splice(i, 1, singletonList(-i), subject);
+        }
+        Iterable<Integer> step2 = drop(COUNT, subject);
+        assertEquals(-COUNT, (int) step2.iterator().next());
     }
 }
