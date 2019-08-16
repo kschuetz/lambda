@@ -148,6 +148,43 @@ public class SpliceTest {
     }
 
     @Test
+    public void splicingASplicingIterableIntoASplicingIterable() {
+        List<Integer> list1 = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        List<Integer> list2 = asList(11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+        List<Integer> list3 = asList(21, 22, 23, 24, 25);
+        List<Integer> list4 = asList(26, 27, 28, 29, 30);
+        List<Integer> list5 = asList(31, 32, 33, 34);
+        List<Integer> list6 = asList(35, 36, 37, 38);
+        List<Integer> list7 = asList(39, 40);
+
+        Iterable<Integer> compound1 = splice(2, 2, list4,
+                splice(3, 1, list3,
+                        splice(4, 0, list2,
+                                list1)));
+
+        assertThat(compound1, iterates(1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
+
+        Iterable<Integer> compound2 = splice(1, 1, emptyList(),
+                splice(200, 100, list7,
+                        splice(0, 4, list6, list5)));
+
+        assertThat(compound2, iterates(35, 37, 38, 39, 40));
+
+        Iterable<Integer> result1 = splice(4, 0, compound2, compound1);
+
+        assertThat(result1, iterates(1, 2, 26, 27, 35, 37, 38, 39, 40, 28, 29, 30, 22, 23, 24,
+                25, 11, 12, 13, 14, 15,
+                16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
+
+//        Iterable<Integer> result1 = splice(4, 6, compound2, compound1);
+//
+//        assertThat(result1, iterates(1, 2, 26, 27, 35, 37, 38, 39, 40, 25, 11, 12, 13, 14, 15,
+//                16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
+
+
+    }
+
+    @Test
     public void stackSafety() {
         final int COUNT = 10_000;
         Iterable<Integer> subject = iterate(acc -> acc + 1, 0);

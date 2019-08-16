@@ -3,6 +3,9 @@ package com.jnape.palatable.lambda.internal.iteration;
 import java.util.Iterator;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Cons.cons;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Map.map;
+import static com.jnape.palatable.lambda.monoid.builtin.Concat.concat;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 public final class SplicingIterable<A> implements Iterable<A> {
@@ -19,7 +22,16 @@ public final class SplicingIterable<A> implements Iterable<A> {
     }
 
     public SplicingIterable<A> splice(int startIndex, int replaceCount, Iterable<A> source) {
-        return new SplicingIterable<>(cons(new SpliceSegment<>(startIndex, replaceCount, source), segments));
+        if (source instanceof SplicingIterable<?>) {
+            return new SplicingIterable<>(concat(
+                    map(segment -> segment.addToOffset(startIndex), ((SplicingIterable<A>) source).segments),
+                    replaceCount > 0
+                            ? cons(new SpliceSegment<>(startIndex, replaceCount, emptyList()), segments)
+                            : segments));
+
+        } else {
+            return new SplicingIterable<>(cons(new SpliceSegment<>(startIndex, replaceCount, source), segments));
+        }
     }
 
     public static <A> SplicingIterable<A> splicingIterable(Iterable<A> initialSource) {

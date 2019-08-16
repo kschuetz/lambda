@@ -24,4 +24,8 @@ public final class SpliceSegment<A> {
         return replaceCount;
     }
 
+    public SpliceSegment<A> addToOffset(int n) {
+        return new SpliceSegment<>(startOffset + n, replaceCount, source);
+    }
+
 }
