@@ -1,11 +1,12 @@
 package com.jnape.palatable.lambda.internal.iteration;
 
-public class SpliceSource<A> {
+public final class SpliceSegment<A> {
+
     private final Iterable<A> source;
     private final int startOffset;
     private final int replaceCount;
 
-    public SpliceSource(Iterable<A> source, int startOffset, int replaceCount) {
+    public SpliceSegment(int startOffset, int replaceCount, Iterable<A> source) {
         this.source = source;
         this.startOffset = startOffset;
         this.replaceCount = replaceCount;
@@ -21,10 +22,6 @@ public class SpliceSource<A> {
 
     public int getReplaceCount() {
         return replaceCount;
-    }
-
-    public SpliceSourceState<A> initState(SpliceSourceState<A> next) {
-        return new SpliceSourceState<>(startOffset, replaceCount, source.iterator(), next);
     }
 
 }
