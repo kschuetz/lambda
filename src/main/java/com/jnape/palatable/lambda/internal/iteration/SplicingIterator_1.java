@@ -3,9 +3,7 @@ package com.jnape.palatable.lambda.internal.iteration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static java.util.Collections.emptyIterator;
-
-public final class SplicingIterator<A> implements Iterator<A> {
+public final class SplicingIterator_1<A> implements Iterator<A> {
 
     private enum Status {NOT_CACHED, CACHED, DONE}
 
@@ -13,13 +11,12 @@ public final class SplicingIterator<A> implements Iterator<A> {
     private A cachedElement;
     private Status status;
 
-    public SplicingIterator(Iterable<SpliceDirective<A>> sources) {
+    public SplicingIterator_1(Iterable<SpliceSegment<A>> sources) {
         Node<A> prev = null;
-        for (SpliceDirective<A> source : sources) {
-            Node<A> node = source.match(taking -> new Node<A>(taking.getCount(), -1, emptyIterator(), null),
-                    dropping -> new Node<A>(0, dropping.getCount(), emptyIterator(), null),
-                    splicing -> new Node<A>(splicing.getStartOffset(), splicing.getReplaceCount(),
-                            splicing.getSource().iterator(), null));
+        for (SpliceSegment<A> source : sources) {
+            Node<A> node = new Node<>(source.getStartOffset(), source.getReplaceCount(),
+                    source.getSource().iterator(),
+                    null);
             if (prev == null) {
                 this.head = node;
             } else {
@@ -76,13 +73,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
                 cachedElement = source.next();
                 return true;
             } else {
-                int replaceCount = current.getReplaceCount();
-                if (replaceCount < 0) {
-                    // this was a Taking node
-                    head = null;
-                    return false;
-                }
-                skipCount += replaceCount;
+                skipCount += current.getReplaceCount();
 
                 Node<A> next = current.getNext();
                 if (prev == null) {
