@@ -162,7 +162,8 @@ public class SpliceTest {
                         splice(4, 0, list2,
                                 list1)));
 
-        assertThat(compound1, iterates(1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
+        assertThat(compound1, iterates(1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10));
 
         Iterable<Integer> compound2 = splice(1, 1, emptyList(),
                 splice(200, 100, list7,
@@ -170,17 +171,17 @@ public class SpliceTest {
 
         assertThat(compound2, iterates(35, 37, 38, 39, 40));
 
-        Iterable<Integer> result1 = splice(4, 0, compound2, compound1);
+        Iterable<Integer> result1 = splice(4, 3, compound2, compound1);
 
-        assertThat(result1, iterates(1, 2, 26, 27, 35, 37, 38, 39, 40, 28, 29, 30, 22, 23, 24,
+        assertThat(result1, iterates(1, 2, 26, 27, 35, 37, 38, 39, 40, 22, 23, 24,
                 25, 11, 12, 13, 14, 15,
                 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
-//        Iterable<Integer> result1 = splice(4, 6, compound2, compound1);
-//
-//        assertThat(result1, iterates(1, 2, 26, 27, 35, 37, 38, 39, 40, 25, 11, 12, 13, 14, 15,
-//                16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
+        Iterable<Integer> result2 = splice(2, 2, compound1, compound2);
+
+        assertThat(result2, iterates(35, 1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10, 39, 40));
 
     }
 
