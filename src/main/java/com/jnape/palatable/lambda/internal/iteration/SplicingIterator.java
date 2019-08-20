@@ -32,14 +32,18 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
     @Override
     public boolean hasNext() {
+
         if (status == Status.NOT_CACHED) {
             status = readNextElement() ? Status.CACHED : Status.DONE;
+            System.out.println("cachedElement " + cachedElement);
         }
+        System.out.println("hasNext: " + status + " " + this);
         return status == Status.CACHED;
     }
 
     @Override
     public A next() {
+        System.out.println("next " + this);
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -159,5 +163,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
         }
 
     }
+
+    public static boolean debugging = false;
 
 }

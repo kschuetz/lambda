@@ -10,12 +10,15 @@ import testsupport.traits.FiniteIteration;
 import testsupport.traits.ImmutableIteration;
 import testsupport.traits.Laziness;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Repeat.repeat;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Cons.cons;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Drop.drop;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Iterate.iterate;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.ToCollection.toCollection;
 import static com.jnape.palatable.lambda.functions.builtin.fn4.Splice.splice;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -194,5 +197,13 @@ public class SpliceTest {
         }
         Iterable<Integer> step2 = drop(COUNT, subject);
         assertEquals(-COUNT, (int) step2.iterator().next());
+    }
+
+    @Test
+    public void sandbox1() {
+        final int stackBlowingNumber = 1000;
+
+        Iterable<Integer> take = cons(-999, drop(15, take(stackBlowingNumber, iterate(x -> x + 1, 1))));
+        System.out.println(toCollection(ArrayList::new, take).toString());
     }
 }
