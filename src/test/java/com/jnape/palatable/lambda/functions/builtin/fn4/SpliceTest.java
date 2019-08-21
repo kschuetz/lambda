@@ -1,6 +1,7 @@
 package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
 import org.junit.Test;
@@ -37,6 +38,7 @@ public class SpliceTest {
 
     @Test
     public void spliceIsAttachedToEndIfOriginalIsNotLongEnough() {
+//        SplicingIterator.debugging = true;
         assertThat(splice(100, 0, asList(4, 5, 6), asList(1, 2, 3)),
                 iterates(1, 2, 3, 4, 5, 6));
     }
@@ -126,6 +128,7 @@ public class SpliceTest {
         Iterable<Integer> result1 = splice(4, 0, list2, list1);
         assertThat(result1, iterates(1, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
+        SplicingIterator.debugging = true;
         Iterable<Integer> result2 = splice(3, 1, list3, result1);
         assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
                 10));

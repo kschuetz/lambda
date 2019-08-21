@@ -35,15 +35,12 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
         if (status == Status.NOT_CACHED) {
             status = readNextElement() ? Status.CACHED : Status.DONE;
-            System.out.println("cachedElement " + cachedElement);
         }
-        System.out.println("hasNext: " + status + " " + this);
         return status == Status.CACHED;
     }
 
     @Override
     public A next() {
-        System.out.println("next " + this);
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -58,7 +55,17 @@ public final class SplicingIterator<A> implements Iterator<A> {
         Node<A> prev = null;
         Node<A> current = head;
 
+        if (debugging) {
+            System.out.println("----- readNextElement start");
+            dumpNodes(current);
+        }
+
+        foo:
         while (current != null) {
+            if (debugging) {
+                System.out.print("  ");
+                dumpNodes(current);
+            }
             int delay = current.getDelay();
             if (delay > 0) {
                 current.setDelay(delay - 1);
@@ -67,26 +74,40 @@ public final class SplicingIterator<A> implements Iterator<A> {
                 continue;
             }
 
-            Iterator<A> source = current.getSource();
-            if (skipCount > 0 && source.hasNext()) {
-                source.next();
-                skipCount -= 1;
-                prev = null;
-                current = head;
-                continue;
-            }
+//            Iterator<A> source = current.getSource();
+//            if (skipCount > 0 && source.hasNext()) {
+//                source.next();
+//                skipCount -= 1;
+//                prev = null;
+//                current = head;
+//                continue;
+//            }
+            while (current != null && current.getDelay() == 0) {
+                Iterator<A> source = current.getSource();
+                while (skipCount > 0 && source.hasNext()) {
+                    A skipped = source.next();
+                    if (debugging) System.out.println("              skipped = " + skipped);
+                    skipCount -= 1;
+                }
 
-            if (source.hasNext()) {
-                cachedElement = source.next();
-                return true;
-            } else {
+                if (skipCount == 0 && source.hasNext()) {
+                    cachedElement = source.next();
+                    if (debugging) System.out.println("   yield: " + cachedElement);
+                    return true;
+                }
+
+                assert (!source.hasNext());
+
                 int replaceCount = current.getReplaceCount();
+                if (debugging) System.out.println("  r: " + replaceCount);
                 if (replaceCount < 0) {
                     // this was a Taking node
                     head = null;
                     return false;
                 }
+
                 skipCount += replaceCount;
+                if (debugging) System.out.println("  skipCount = " + skipCount);
 
                 Node<A> next = current.getNext();
                 if (prev == null) {
@@ -96,12 +117,52 @@ public final class SplicingIterator<A> implements Iterator<A> {
                 }
                 current = next;
 
-                if (current == null) {
-                    head = normalizeDelays(head);
-                    prev = null;
-                    current = head;
-                }
+//                if (current == null) {
+//                    head = normalizeDelays(head);
+//                    prev = null;
+//                    current = head;
+//                    break;
+//                }
+
             }
+
+            if (current == null) {
+                head = normalizeDelays(head);
+                prev = null;
+                current = head;
+            } else if (current.getDelay() > 0) {
+                System.out.println("       delay > 0");
+                current = head;
+                prev = null;
+            }
+
+
+//            if (source.hasNext()) {
+//                cachedElement = source.next();
+//                return true;
+//            } else {
+//                int replaceCount = current.getReplaceCount();
+//                if (replaceCount < 0) {
+//                    // this was a Taking node
+//                    head = null;
+//                    return false;
+//                }
+//                skipCount += replaceCount;
+//
+//                Node<A> next = current.getNext();
+//                if (prev == null) {
+//                    head = next;
+//                } else {
+//                    prev.setNext(next);
+//                }
+//                current = next;
+//
+//                if (current == null) {
+//                    head = normalizeDelays(head);
+//                    prev = null;
+//                    current = head;
+//                }
+//            }
         }
 
         return false;
@@ -162,8 +223,21 @@ public final class SplicingIterator<A> implements Iterator<A> {
             this.next = next;
         }
 
+        @Override
+        public String toString() {
+            return "[" + delay + ":" + replaceCount + ":" +
+                    (source.hasNext() ? "+" : "_") + "]";
+        }
     }
 
     public static boolean debugging = false;
+
+    private static <A> void dumpNodes(Node<A> node) {
+        while (node != null) {
+            System.out.print(node);
+            node = node.next;
+        }
+        System.out.println("$");
+    }
 
 }

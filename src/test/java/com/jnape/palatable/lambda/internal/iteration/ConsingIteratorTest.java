@@ -55,8 +55,8 @@ public class ConsingIteratorTest {
                                            take(stackBlowingNumber, iterate(x -> x + 1, 1)))
                 .value();
 
-        SplicingIterator.debugging = true;
-        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
+//        SplicingIterator.debugging = true;
+//        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
 
         assertEquals(stackBlowingNumber,
                      take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
