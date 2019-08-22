@@ -50,6 +50,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
         return result;
     }
 
+
     private boolean readNextElement() {
         long skipCount = 0;
         Node<A> prev = null;
@@ -60,44 +61,35 @@ public final class SplicingIterator<A> implements Iterator<A> {
             dumpNodes(current);
         }
 
-        foo:
+        outer:
         while (current != null) {
-            if (debugging) {
-                System.out.print("  ");
-                dumpNodes(current);
-            }
+            if (debugging) System.out.println("dec delays");
             int delay = current.getDelay();
             if (delay > 0) {
                 current.setDelay(delay - 1);
                 prev = current;
                 current = current.getNext();
+
+                if (current == null) {
+                    head = normalizeDelays(head);
+                    prev = null;
+                    current = head;
+                }
+
                 continue;
             }
 
-//            Iterator<A> source = current.getSource();
-//            if (skipCount > 0 && source.hasNext()) {
-//                source.next();
-//                skipCount -= 1;
-//                prev = null;
-//                current = head;
-//                continue;
-//            }
-            while (current != null && current.getDelay() == 0) {
-                Iterator<A> source = current.getSource();
-                while (skipCount > 0 && source.hasNext()) {
-                    A skipped = source.next();
-                    if (debugging) System.out.println("              skipped = " + skipped);
-                    skipCount -= 1;
-                }
+            if (debugging) {
+                System.out.print("    after dec delays: ");
+                dumpNodes(head);
+            }
 
-                if (skipCount == 0 && source.hasNext()) {
-                    cachedElement = source.next();
-                    if (debugging) System.out.println("   yield: " + cachedElement);
-                    return true;
-                }
+            assert (current.getDelay() == 0);
 
-                assert (!source.hasNext());
 
+            Iterator<A> source = current.getSource();
+            // find a way to GOTO here
+            if (!source.hasNext()) {
                 int replaceCount = current.getReplaceCount();
                 if (debugging) System.out.println("  r: " + replaceCount);
                 if (replaceCount < 0) {
@@ -115,54 +107,36 @@ public final class SplicingIterator<A> implements Iterator<A> {
                 } else {
                     prev.setNext(next);
                 }
-                current = next;
 
-//                if (current == null) {
-//                    head = normalizeDelays(head);
-//                    prev = null;
-//                    current = head;
-//                    break;
-//                }
+                if (debugging) {
+                    System.out.print("    after removing node: ");
+                    dumpNodes(head);
+                }
 
+                if (next == null) {
+                    prev = null;
+                    current = head;
+                } else {
+                    current = next;
+                }
+                continue outer;
             }
 
-            if (current == null) {
-                head = normalizeDelays(head);
-                prev = null;
-                current = head;
-            } else if (current.getDelay() > 0) {
-                System.out.println("       delay > 0");
-                current = head;
-                prev = null;
+            if (skipCount == 0) {
+                cachedElement = source.next();
+                if (debugging) System.out.println("   yield: " + cachedElement);
+                return true;
             }
 
-
-//            if (source.hasNext()) {
-//                cachedElement = source.next();
-//                return true;
-//            } else {
-//                int replaceCount = current.getReplaceCount();
-//                if (replaceCount < 0) {
-//                    // this was a Taking node
-//                    head = null;
-//                    return false;
-//                }
-//                skipCount += replaceCount;
-//
-//                Node<A> next = current.getNext();
-//                if (prev == null) {
-//                    head = next;
-//                } else {
-//                    prev.setNext(next);
-//                }
-//                current = next;
-//
-//                if (current == null) {
-//                    head = normalizeDelays(head);
-//                    prev = null;
-//                    current = head;
-//                }
+//            while (skipCount > 0 && source.hasNext()) {
+            A skipped = source.next();
+            if (debugging) System.out.println("              skipped = " + skipped);
+            skipCount -= 1;
 //            }
+
+
+            current = head;
+            prev = null;
         }
 
         return false;

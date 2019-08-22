@@ -1,7 +1,6 @@
 package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
 import org.junit.Test;
@@ -11,15 +10,12 @@ import testsupport.traits.FiniteIteration;
 import testsupport.traits.ImmutableIteration;
 import testsupport.traits.Laziness;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Repeat.repeat;
-import static com.jnape.palatable.lambda.functions.builtin.fn2.Cons.cons;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Drop.drop;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Iterate.iterate;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
-import static com.jnape.palatable.lambda.functions.builtin.fn2.ToCollection.toCollection;
 import static com.jnape.palatable.lambda.functions.builtin.fn4.Splice.splice;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -105,6 +101,7 @@ public class SpliceTest {
 
     @Test
     public void spliceFiniteIntoInfiniteOriginal() {
+//        SplicingIterator.debugging = true;
         assertThat(take(10, splice(3, 0, asList(1, 2, 3), repeat(100))),
                 iterates(100, 100, 100, 1, 2, 3, 100, 100, 100, 100));
     }
@@ -128,7 +125,7 @@ public class SpliceTest {
         Iterable<Integer> result1 = splice(4, 0, list2, list1);
         assertThat(result1, iterates(1, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
-        SplicingIterator.debugging = true;
+//        SplicingIterator.debugging = true;
         Iterable<Integer> result2 = splice(3, 1, list3, result1);
         assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
                 10));
@@ -202,11 +199,53 @@ public class SpliceTest {
         assertEquals(-COUNT, (int) step2.iterator().next());
     }
 
-    @Test
-    public void sandbox1() {
-        final int stackBlowingNumber = 1000;
+//    @Test
+//    public void sandbox1() {
+//        final int stackBlowingNumber = 1000;
+//
+//        Iterable<Integer> take = cons(-999, drop(15, take(stackBlowingNumber, iterate(x -> x + 1, 1))));
+//        System.out.println(toCollection(ArrayList::new, take).toString());
+//    }
 
-        Iterable<Integer> take = cons(-999, drop(15, take(stackBlowingNumber, iterate(x -> x + 1, 1))));
-        System.out.println(toCollection(ArrayList::new, take).toString());
+    @Test
+    public void sandbox2() {
+        List<Integer> list1 = asList(1, 2, 3, 4, 5);
+        List<Integer> list2 = asList(11, 12, 13);
+        List<Integer> list3 = singletonList(21);
+
+        Iterable<Integer> result1 = splice(1, 0, list2, list1);
+        assertThat(result1, iterates(1, 11, 12, 13, 2, 3, 4, 5));
+
+
+        Iterable<Integer> result2 = splice(3, 2, list3, result1);
+        assertThat(result2, iterates(1, 11, 12, 21, 3, 4, 5));
+
+//        SplicingIterator.debugging = true;
+        Iterable<Integer> result3 = splice(1, 2, list3, result2);
+        assertThat(result3, iterates(1, 21, 21, 3, 4, 5));
+
+//        SplicingIterator.debugging = true;
+//        Iterable<Integer> result2 = splice(3, 1, list3, result1);
+//        assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
+//                10));
+//
+//        Iterable<Integer> result3 = splice(2, 2, list4, result2);
+//        assertThat(result3, iterates(1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+//                5, 6, 7, 8, 9, 10));
+//
+//        Iterable<Integer> result4 = splice(1, 3, list5, result3);
+//        assertThat(result4, iterates(1, 31, 32, 33, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+//                20, 5, 6, 7, 8, 9, 10));
+//
+//        Iterable<Integer> result5 = splice(0, 4, list6, result4);
+//        assertThat(result5, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+//                20, 5, 6, 7, 8, 9, 10));
+//
+//        Iterable<Integer> result6 = splice(200, 100, list7, result5);
+//        assertThat(result6, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+//                20, 5, 6, 7, 8, 9, 10, 39, 40));
+//
+//        Iterable<Integer> result7 = splice(1, 28, emptyList(), result6);
+//        assertThat(result7, iterates(35, 40));
     }
 }
