@@ -1,8 +1,11 @@
 package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.internal.iteration.ConsingIterator;
+import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import testsupport.traits.EmptyIterableSupport;
@@ -10,13 +13,16 @@ import testsupport.traits.FiniteIteration;
 import testsupport.traits.ImmutableIteration;
 import testsupport.traits.Laziness;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Repeat.repeat;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Drop.drop;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Iterate.iterate;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
+import static com.jnape.palatable.lambda.functions.builtin.fn3.FoldRight.foldRight;
 import static com.jnape.palatable.lambda.functions.builtin.fn4.Splice.splice;
+import static com.jnape.palatable.lambda.functor.builtin.Lazy.lazy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -247,5 +253,37 @@ public class SpliceTest {
 //
 //        Iterable<Integer> result7 = splice(1, 28, emptyList(), result6);
 //        assertThat(result7, iterates(35, 40));
+    }
+
+    @Test
+    public void sandbox3() {
+        Integer stackBlowingNumber = 5;
+        Iterable<Integer> ints = foldRight((x, lazyAcc) -> lazyAcc.fmap(acc -> () -> new ConsingIterator<>(x, acc)),
+                lazy((Iterable<Integer>) Collections.<Integer>emptyList()),
+                take(stackBlowingNumber, iterate(x -> x + 1, 1)))
+                .value();
+
+        SplicingIterator.debugging = true;
+//        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
+        try {
+            Assert.assertEquals(stackBlowingNumber,
+                    take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
+        } finally {
+            SplicingIterator.debugging = false;
+        }
+    }
+
+    @Test
+    public void sandbox4() {
+        List<Integer> list1 = asList(1, 2, 3, 4, 5, 6, 7, 8);
+        List<Integer> list2 = asList(99, 88, 77);
+
+        Iterable<Integer> result = splice(1, 1, list2, drop(4, list1));
+        SplicingIterator.debugging = true;
+        try {
+            assertThat(result, iterates(5, 99, 88, 77, 6, 7, 8));
+        } finally {
+            SplicingIterator.debugging = false;
+        }
     }
 }

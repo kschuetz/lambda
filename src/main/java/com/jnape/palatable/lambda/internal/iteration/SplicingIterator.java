@@ -61,45 +61,31 @@ public final class SplicingIterator<A> implements Iterator<A> {
             dumpNodes(current);
         }
 
-        outer:
         while (current != null) {
-            if (debugging) System.out.println("dec delays");
             int delay = current.getDelay();
-            if (delay > 0) {
-                current.setDelay(delay - 1);
-                prev = current;
-                current = current.getNext();
+            if (delay == 0) {
 
-                if (current == null) {
-                    head = normalizeDelays(head);
-                    prev = null;
-                    current = head;
+                Iterator<A> source = current.getSource();
+                while (skipCount > 0 && source.hasNext()) {
+                    source.next();
+                    skipCount -= 1;
                 }
 
-                continue;
-            }
+                if (source.hasNext()) {
+                    // skipCount must equal 0 here
+                    cachedElement = source.next();
+                    return true;
+                }
 
-            if (debugging) {
-                System.out.print("    after dec delays: ");
-                dumpNodes(head);
-            }
-
-            assert (current.getDelay() == 0);
-
-
-            Iterator<A> source = current.getSource();
-            // find a way to GOTO here
-            if (!source.hasNext()) {
-                int replaceCount = current.getReplaceCount();
-                if (debugging) System.out.println("  r: " + replaceCount);
-                if (replaceCount < 0) {
-                    // this was a Taking node
+                // exhausted, destroy the node
+                if (current.replaceCount < 0) {
+                    // taking node
+                    cachedElement = null;
                     head = null;
                     return false;
                 }
 
-                skipCount += replaceCount;
-                if (debugging) System.out.println("  skipCount = " + skipCount);
+                skipCount += current.replaceCount;
 
                 Node<A> next = current.getNext();
                 if (prev == null) {
@@ -108,35 +94,20 @@ public final class SplicingIterator<A> implements Iterator<A> {
                     prev.setNext(next);
                 }
 
-                if (debugging) {
-                    System.out.print("    after removing node: ");
-                    dumpNodes(head);
-                }
+                current = next;
 
-                if (next == null) {
-                    prev = null;
-                    current = head;
-                } else {
-                    current = next;
-                }
-                continue outer;
+
+            } else {
+                current.setDelay(delay - 1);
+                prev = current;
+                current = current.getNext();
             }
 
-            if (skipCount == 0) {
-                cachedElement = source.next();
-                if (debugging) System.out.println("   yield: " + cachedElement);
-                return true;
+            if (current == null) {
+                head = normalizeDelays(head);
+                prev = null;
+                current = head;
             }
-
-//            while (skipCount > 0 && source.hasNext()) {
-            A skipped = source.next();
-            if (debugging) System.out.println("              skipped = " + skipped);
-            skipCount -= 1;
-//            }
-
-
-            current = head;
-            prev = null;
         }
 
         return false;
@@ -213,5 +184,108 @@ public final class SplicingIterator<A> implements Iterator<A> {
         }
         System.out.println("$");
     }
+
+//    private boolean readNextElement() {
+//        long skipCount = 0;
+//        Node<A> prev = null;
+//        Node<A> current = head;
+//
+//        if (debugging) {
+//            System.out.println("----- readNextElement start");
+//            dumpNodes(current);
+//        }
+//
+//        outer:
+//        while (current != null) {
+//            if (debugging) System.out.println("dec delays");
+//            int delay = current.getDelay();
+//            if (delay > 0) {
+//                current.setDelay(delay - 1);
+//                prev = current;
+//                current = current.getNext();
+//
+//                if (current == null) {
+//                    head = normalizeDelays(head);
+//                    prev = null;
+//                    current = head;
+//                }
+//
+//                continue;
+//            }
+//
+//            if (debugging) {
+//                System.out.print("    after dec delays: ");
+//                dumpNodes(head);
+//            }
+//
+//            assert (current.getDelay() == 0);
+//
+//
+//            Iterator<A> source = current.getSource();
+//            // find a way to GOTO here
+//            if (!source.hasNext()) {
+//                Node<A> next = current.getNext();
+//                int replaceCount = current.getReplaceCount();
+//                if (debugging) System.out.println("  r: " + replaceCount);
+//                if (replaceCount < 0) {
+//                    // this was a Taking node
+//
+//                    if(skipCount == 0) {
+//                        head = null;
+//                        if (debugging) System.out.println(" taking node exhausted");
+//                        return false;
+//                    }
+//
+//                    if(debugging) {
+//                        System.out.println(" on taking node with skipCount > 0");
+//                    }
+//                } else {
+//
+//                    skipCount += replaceCount;
+//                    if (debugging) System.out.println("  skipCount = " + skipCount);
+//
+//
+//                    if (prev == null) {
+//                        head = next;
+//                    } else {
+//                        prev.setNext(next);
+//                    }
+//
+//                    if (debugging) {
+//                        System.out.print("    after removing node: ");
+//                        dumpNodes(head);
+//                    }
+//
+//                }
+//
+//                if (next == null) {
+//                    prev = null;
+//                    current = head;
+//                } else {
+//                    current = next;
+//                }
+//                continue outer;
+//            }
+//
+//            if (skipCount == 0) {
+//                cachedElement = source.next();
+//                if (debugging) System.out.println("   yield: " + cachedElement);
+//                return true;
+//            }
+//
+////            while (skipCount > 0 && source.hasNext()) {
+//            A skipped = source.next();
+//            if (debugging) System.out.println("              skipped = " + skipped);
+//            skipCount -= 1;
+////            }
+//
+//
+//            current = head;
+//            prev = null;
+//        }
+//
+//        if(debugging) System.out.println("exhausted");
+//        return false;
+//    }
 
 }

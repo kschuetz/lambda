@@ -49,14 +49,11 @@ public class ConsingIteratorTest {
 
     @Test
     public void stackSafety() {
-        Integer stackBlowingNumber = 5;
+        Integer stackBlowingNumber = 10_000;
         Iterable<Integer> ints = foldRight((x, lazyAcc) -> lazyAcc.fmap(acc -> () -> new ConsingIterator<>(x, acc)),
                                            lazy((Iterable<Integer>) Collections.<Integer>emptyList()),
                                            take(stackBlowingNumber, iterate(x -> x + 1, 1)))
                 .value();
-
-        SplicingIterator.debugging = true;
-//        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
 
         assertEquals(stackBlowingNumber,
                      take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
