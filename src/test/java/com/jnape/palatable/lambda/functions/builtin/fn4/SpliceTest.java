@@ -131,6 +131,7 @@ public class SpliceTest {
         Iterable<Integer> result1 = splice(4, 0, list2, list1);
         assertThat(result1, iterates(1, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
+
 //        SplicingIterator.debugging = true;
         Iterable<Integer> result2 = splice(3, 1, list3, result1);
         assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
@@ -152,8 +153,11 @@ public class SpliceTest {
         assertThat(result6, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                 20, 5, 6, 7, 8, 9, 10, 39, 40));
 
+//        SplicingIterator.debugging = true;
         Iterable<Integer> result7 = splice(1, 28, emptyList(), result6);
         assertThat(result7, iterates(35, 40));
+
+//        fail("foo");
     }
 
     @Test
@@ -218,6 +222,7 @@ public class SpliceTest {
         List<Integer> list1 = asList(1, 2, 3, 4, 5);
         List<Integer> list2 = asList(11, 12, 13);
         List<Integer> list3 = singletonList(21);
+        List<Integer> list4 = singletonList(22);
 
         Iterable<Integer> result1 = splice(1, 0, list2, list1);
         assertThat(result1, iterates(1, 11, 12, 13, 2, 3, 4, 5));
@@ -226,9 +231,9 @@ public class SpliceTest {
         Iterable<Integer> result2 = splice(3, 2, list3, result1);
         assertThat(result2, iterates(1, 11, 12, 21, 3, 4, 5));
 
-//        SplicingIterator.debugging = true;
-        Iterable<Integer> result3 = splice(1, 2, list3, result2);
-        assertThat(result3, iterates(1, 21, 21, 3, 4, 5));
+        SplicingIterator.debugging = true;
+        Iterable<Integer> result3 = splice(1, 2, list4, result2);
+        assertThat(result3, iterates(1, 22, 21, 3, 4, 5));
 
 //        SplicingIterator.debugging = true;
 //        Iterable<Integer> result2 = splice(3, 1, list3, result1);
@@ -281,7 +286,7 @@ public class SpliceTest {
         Iterable<Integer> result = splice(1, 1, list2, drop(4, list1));
         SplicingIterator.debugging = true;
         try {
-            assertThat(result, iterates(5, 99, 88, 77, 6, 7, 8));
+            assertThat(result, iterates(5, 99, 88, 77, 7, 8));
         } finally {
             SplicingIterator.debugging = false;
         }
