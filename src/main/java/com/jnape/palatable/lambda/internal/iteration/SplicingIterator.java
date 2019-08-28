@@ -3,6 +3,7 @@ package com.jnape.palatable.lambda.internal.iteration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static java.lang.Math.min;
 import static java.util.Collections.emptyIterator;
 
 public final class SplicingIterator<A> implements Iterator<A> {
@@ -17,15 +18,15 @@ public final class SplicingIterator<A> implements Iterator<A> {
         Node<A> prev = null;
         for (SpliceDirective<A> source : sources) {
             Node<A> node = source.match(taking -> new Node<A>(taking.getCount(), -1, emptyIterator()),
-                    dropping -> new Node<A>(0, dropping.getCount(), emptyIterator()),
-                    splicing -> new Node<A>(splicing.getStartOffset(), splicing.getReplaceCount(),
+                    dropping -> new Node<>(0, dropping.getCount(), emptyIterator()),
+                    splicing -> new Node<>(splicing.getStartOffset(), splicing.getReplaceCount(),
                             splicing.getSource().iterator()));
             if (prev == null) {
                 this.head = node;
             } else {
-                prev.setNext(node);
+                prev.next = node;
             }
-            node.setPrev(prev);
+            node.prev = prev;
             prev = node;
         }
         this.status = Status.NOT_CACHED;
@@ -33,7 +34,6 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
     @Override
     public boolean hasNext() {
-
         if (status == Status.NOT_CACHED) {
             status = readNextElement() ? Status.CACHED : Status.DONE;
         }
@@ -58,33 +58,33 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
         Node<A> current = head;
 
-        while (true) {
+        do {
             while (current != null) {
-                if (current.getDelay() == 0) {
-                    if (current.getSource().hasNext()) {
+                if (current.delay == 0) {
+                    if (current.source.hasNext()) {
                         break;
                     }
 
-                    if (current.getReplaceCount() < 0) {
-                        // taking node;  done
+                    if (current.replaceCount < 0) {
+                        // This is a 'take' node;  terminate immediately
                         cachedElement = null;
                         head = null;
                         return false;
-                    } else if (current.getReplaceCount() == 0 || current.getNext() == null) {
+                    } else if (current.replaceCount == 0 || current.next == null) {
                         // discard
-                        Node<A> prev = current.getPrev();
-                        Node<A> next = current.getNext();
+                        Node<A> prev = current.prev;
+                        Node<A> next = current.next;
                         if (prev == null) {
                             head = next;
                         } else {
-                            prev.setNext(next);
+                            prev.next = next;
                         }
                         if (next != null) {
-                            next.setPrev(prev);
+                            next.prev = prev;
                         }
                     }
                 }
-                current = current.getNext();
+                current = current.next;
             }
 
             if (current == null) {
@@ -98,55 +98,63 @@ public final class SplicingIterator<A> implements Iterator<A> {
             }
 
             // current has 0 delay and has next
-            cachedElement = current.getSource().next();
+            cachedElement = current.source.next();
 
-            current = current.getPrev();
-            // go backwards
+            current = current.prev;
+
+            // go backwards, decrementing delays, until stopped by a node with a replace count
             while (current != null) {
-                if (current.getDelay() > 0) {
-                    current.setDelay(current.getDelay() - 1);
-                } else if (current.getReplaceCount() > 0) {
-                    current.setReplaceCount(current.getReplaceCount() - 1);
+                if (current.delay > 0) {
+                    current.delay = current.delay - 1;
+                } else if (current.replaceCount > 0) {
+                    current.replaceCount = current.replaceCount - 1;
+                    cachedElement = null;
                     break;
                 }
-                current = current.getPrev();
+                current = current.prev;
             }
 
             if (current == null) {
                 return true;
             }
-        }
+
+        } while (true);
     }
 
-    private static <A> Node<A> normalizeDelays(Node<A> first) {
-        while (first != null && !first.getSource().hasNext()) {
-            first = first.getNext();
+    private static <A> Node<A> normalizeDelays(Node<A> head) {
+        if (head == null) {
+            return null;
+        }
+        Node<A> first = head;
+
+        while (first != null && !first.source.hasNext()) {
+            first = first.next;
         }
 
         if (first == null) {
             return null;
         }
 
-        int minDelay = first.getDelay();
-        Node<A> current = first.getNext();
-        while (current != null && current.getDelay() > 0 && current.getSource().hasNext()) {
-            minDelay = Math.min(minDelay, current.getDelay());
-            current = current.getNext();
+        int minDelay = first.delay;
+        Node<A> current = first.next;
+        while (current != null && current.delay > 0 && current.source.hasNext()) {
+            minDelay = min(minDelay, current.delay);
+            current = current.next;
         }
         current = first;
-        while (current != null && current.getDelay() > 0 && current.getSource().hasNext()) {
-            current.setDelay(current.getDelay() - minDelay);
-            current = current.getNext();
+        while (current != null && current.delay > 0 && current.source.hasNext()) {
+            current.delay = current.delay - minDelay;
+            current = current.next;
         }
-        return first;
+        return head;
     }
 
     private static final class Node<A> {
-        private int delay;
-        private int replaceCount;
-        private Iterator<A> source;
-        private Node<A> prev;
-        private Node<A> next;
+        final Iterator<A> source;
+        int delay;
+        int replaceCount;
+        Node<A> prev;
+        Node<A> next;
 
         Node(int delay, int replaceCount, Iterator<A> source) {
             this.delay = delay;
@@ -154,42 +162,6 @@ public final class SplicingIterator<A> implements Iterator<A> {
             this.source = source;
             this.prev = null;
             this.next = null;
-        }
-
-        int getDelay() {
-            return delay;
-        }
-
-        void setDelay(int delay) {
-            this.delay = delay;
-        }
-
-        int getReplaceCount() {
-            return replaceCount;
-        }
-
-        void setReplaceCount(int replaceCount) {
-            this.replaceCount = replaceCount;
-        }
-
-        Iterator<A> getSource() {
-            return source;
-        }
-
-        Node<A> getNext() {
-            return next;
-        }
-
-        void setNext(Node<A> next) {
-            this.next = next;
-        }
-
-        Node<A> getPrev() {
-            return prev;
-        }
-
-        void setPrev(Node<A> prev) {
-            this.prev = prev;
         }
 
         @Override

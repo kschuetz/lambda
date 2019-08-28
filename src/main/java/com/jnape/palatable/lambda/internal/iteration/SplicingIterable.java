@@ -38,9 +38,9 @@ public final class SplicingIterable<A> implements Iterable<A> {
     }
 
     private SplicingIterable<A> prepend(SpliceDirective<A> directive) {
-        Maybe<SpliceDirective<A>> spliceDirectiveMaybe = segments.head().flatMap(h -> h.combine(directive));
+        Maybe<SpliceDirective<A>> maybeCombined = segments.head().flatMap(h -> h.combine(directive));
 
-        ImmutableQueue<SpliceDirective<A>> newSegments = spliceDirectiveMaybe
+        ImmutableQueue<SpliceDirective<A>> newSegments = maybeCombined
                 .match(__ -> segments.pushFront(directive),
                         newDirective -> segments.tail().pushFront(newDirective));
 
@@ -51,7 +51,7 @@ public final class SplicingIterable<A> implements Iterable<A> {
         if (initialSource instanceof SplicingIterable<?>) {
             return (SplicingIterable<A>) initialSource;
         } else {
-            return new SplicingIterable<A>(ImmutableQueue.<SpliceDirective<A>>empty()
+            return new SplicingIterable<>(ImmutableQueue.<SpliceDirective<A>>empty()
                     .pushFront(SpliceDirective.splice(0, 0, initialSource)));
         }
     }
