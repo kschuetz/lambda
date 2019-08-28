@@ -2,7 +2,6 @@ package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.internal.iteration.ConsingIterator;
-import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
 import org.junit.Assert;
@@ -107,7 +106,6 @@ public class SpliceTest {
 
     @Test
     public void spliceFiniteIntoInfiniteOriginal() {
-//        SplicingIterator.debugging = true;
         assertThat(take(10, splice(3, 0, asList(1, 2, 3), repeat(100))),
                 iterates(100, 100, 100, 1, 2, 3, 100, 100, 100, 100));
     }
@@ -131,8 +129,6 @@ public class SpliceTest {
         Iterable<Integer> result1 = splice(4, 0, list2, list1);
         assertThat(result1, iterates(1, 2, 3, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9, 10));
 
-
-//        SplicingIterator.debugging = true;
         Iterable<Integer> result2 = splice(3, 1, list3, result1);
         assertThat(result2, iterates(1, 2, 3, 21, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 5, 6, 7, 8, 9,
                 10));
@@ -153,11 +149,8 @@ public class SpliceTest {
         assertThat(result6, iterates(35, 36, 37, 38, 34, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                 20, 5, 6, 7, 8, 9, 10, 39, 40));
 
-//        SplicingIterator.debugging = true;
         Iterable<Integer> result7 = splice(1, 28, emptyList(), result6);
         assertThat(result7, iterates(35, 40));
-
-//        fail("foo");
     }
 
     @Test
@@ -193,8 +186,8 @@ public class SpliceTest {
 
         Iterable<Integer> result2 = splice(2, 2, compound1, compound2);
 
-        assertThat(result2, iterates(35, 1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                20, 5, 6, 7, 8, 9, 10, 39, 40));
+        assertThat(result2, iterates(35, 37, 1, 2, 26, 27, 28, 29, 30, 22, 23, 24, 25, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                20, 5, 6, 7, 8, 9, 10, 40));
 
     }
 
@@ -208,14 +201,6 @@ public class SpliceTest {
         Iterable<Integer> step2 = drop(COUNT, subject);
         assertEquals(-COUNT, (int) step2.iterator().next());
     }
-
-//    @Test
-//    public void sandbox1() {
-//        final int stackBlowingNumber = 1000;
-//
-//        Iterable<Integer> take = cons(-999, drop(15, take(stackBlowingNumber, iterate(x -> x + 1, 1))));
-//        System.out.println(toCollection(ArrayList::new, take).toString());
-//    }
 
     @Test
     public void sandbox2() {
@@ -231,7 +216,6 @@ public class SpliceTest {
         Iterable<Integer> result2 = splice(3, 2, list3, result1);
         assertThat(result2, iterates(1, 11, 12, 21, 3, 4, 5));
 
-        SplicingIterator.debugging = true;
         Iterable<Integer> result3 = splice(1, 2, list4, result2);
         assertThat(result3, iterates(1, 22, 21, 3, 4, 5));
 
@@ -262,20 +246,15 @@ public class SpliceTest {
 
     @Test
     public void sandbox3() {
-        Integer stackBlowingNumber = 5;
+        Integer stackBlowingNumber = 10_000;
         Iterable<Integer> ints = foldRight((x, lazyAcc) -> lazyAcc.fmap(acc -> () -> new ConsingIterator<>(x, acc)),
                 lazy((Iterable<Integer>) Collections.<Integer>emptyList()),
                 take(stackBlowingNumber, iterate(x -> x + 1, 1)))
                 .value();
 
-        SplicingIterator.debugging = true;
 //        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
-        try {
             Assert.assertEquals(stackBlowingNumber,
                     take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
-        } finally {
-            SplicingIterator.debugging = false;
-        }
     }
 
     @Test
@@ -284,11 +263,6 @@ public class SpliceTest {
         List<Integer> list2 = asList(99, 88, 77);
 
         Iterable<Integer> result = splice(1, 1, list2, drop(4, list1));
-        SplicingIterator.debugging = true;
-        try {
-            assertThat(result, iterates(5, 99, 88, 77, 7, 8));
-        } finally {
-            SplicingIterator.debugging = false;
-        }
+        assertThat(result, iterates(5, 99, 88, 77, 7, 8));
     }
 }
