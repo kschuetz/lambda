@@ -58,13 +58,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
         Node<A> current = head;
 
-//        dumpNodes(head);
         while (true) {
-
-            if (debugging) {
-                dumpNodes(current);
-            }
-            // find zero that has next
             while (current != null) {
                 if (current.getDelay() == 0) {
                     if (current.getSource().hasNext()) {
@@ -123,9 +117,6 @@ public final class SplicingIterator<A> implements Iterator<A> {
             }
         }
     }
-
-
-
 
     private static <A> Node<A> normalizeDelays(Node<A> first) {
         while (first != null && !first.getSource().hasNext()) {
@@ -207,181 +198,5 @@ public final class SplicingIterator<A> implements Iterator<A> {
                     (source.hasNext() ? "+" : "_") + "]";
         }
     }
-
-    public static boolean debugging = false;
-
-    private static <A> void dumpNodes(Node<A> node) {
-        while (node != null) {
-            System.out.print(node);
-            node = node.next;
-        }
-        System.out.println("$");
-    }
-
-//  TAKE 2
-//    private boolean readNextElement() {
-//        long skipCount = 0;
-//        Node<A> prev = null;
-//        Node<A> current = head;
-//
-//        if (debugging) {
-//            System.out.println("----- readNextElement start");
-//            dumpNodes(current);
-//        }
-//
-//        while (current != null) {
-//            int delay = current.getDelay();
-//            if (delay == 0) {
-//
-//                Iterator<A> source = current.getSource();
-//                while (skipCount > 0 && source.hasNext()) {
-//                    source.next();
-//                    skipCount -= 1;
-//                }
-//
-//                if (source.hasNext()) {
-//                    // skipCount must equal 0 here
-//                    cachedElement = source.next();
-//                    return true;
-//                }
-//
-//                // exhausted, destroy the node
-//                if (current.replaceCount < 0) {
-//                    // taking node
-//                    cachedElement = null;
-//                    head = null;
-//                    return false;
-//                }
-//
-//                skipCount += current.replaceCount;
-//
-//                Node<A> next = current.getNext();
-//                if (prev == null) {
-//                    head = next;
-//                } else {
-//                    prev.setNext(next);
-//                }
-//
-//                current = next;
-//
-//
-//            } else {
-//                current.setDelay(delay - 1);
-//                prev = current;
-//                current = current.getNext();
-//            }
-//
-//            if (current == null) {
-//                head = normalizeDelays(head);
-//                prev = null;
-//                current = head;
-//            }
-//        }
-//
-//        return false;
-//    }
-
-//    private boolean readNextElement() {
-//        long skipCount = 0;
-//        Node<A> prev = null;
-//        Node<A> current = head;
-//
-//        if (debugging) {
-//            System.out.println("----- readNextElement start");
-//            dumpNodes(current);
-//        }
-//
-//        outer:
-//        while (current != null) {
-//            if (debugging) System.out.println("dec delays");
-//            int delay = current.getDelay();
-//            if (delay > 0) {
-//                current.setDelay(delay - 1);
-//                prev = current;
-//                current = current.getNext();
-//
-//                if (current == null) {
-//                    head = normalizeDelays(head);
-//                    prev = null;
-//                    current = head;
-//                }
-//
-//                continue;
-//            }
-//
-//            if (debugging) {
-//                System.out.print("    after dec delays: ");
-//                dumpNodes(head);
-//            }
-//
-//            assert (current.getDelay() == 0);
-//
-//
-//            Iterator<A> source = current.getSource();
-//            // find a way to GOTO here
-//            if (!source.hasNext()) {
-//                Node<A> next = current.getNext();
-//                int replaceCount = current.getReplaceCount();
-//                if (debugging) System.out.println("  r: " + replaceCount);
-//                if (replaceCount < 0) {
-//                    // this was a Taking node
-//
-//                    if(skipCount == 0) {
-//                        head = null;
-//                        if (debugging) System.out.println(" taking node exhausted");
-//                        return false;
-//                    }
-//
-//                    if(debugging) {
-//                        System.out.println(" on taking node with skipCount > 0");
-//                    }
-//                } else {
-//
-//                    skipCount += replaceCount;
-//                    if (debugging) System.out.println("  skipCount = " + skipCount);
-//
-//
-//                    if (prev == null) {
-//                        head = next;
-//                    } else {
-//                        prev.setNext(next);
-//                    }
-//
-//                    if (debugging) {
-//                        System.out.print("    after removing node: ");
-//                        dumpNodes(head);
-//                    }
-//
-//                }
-//
-//                if (next == null) {
-//                    prev = null;
-//                    current = head;
-//                } else {
-//                    current = next;
-//                }
-//                continue outer;
-//            }
-//
-//            if (skipCount == 0) {
-//                cachedElement = source.next();
-//                if (debugging) System.out.println("   yield: " + cachedElement);
-//                return true;
-//            }
-//
-////            while (skipCount > 0 && source.hasNext()) {
-//            A skipped = source.next();
-//            if (debugging) System.out.println("              skipped = " + skipped);
-//            skipCount -= 1;
-////            }
-//
-//
-//            current = head;
-//            prev = null;
-//        }
-//
-//        if(debugging) System.out.println("exhausted");
-//        return false;
-//    }
 
 }

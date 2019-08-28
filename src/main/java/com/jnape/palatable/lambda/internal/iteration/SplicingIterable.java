@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.adt.Maybe;
 
 import java.util.Iterator;
 
-import static com.jnape.palatable.lambda.internal.iteration.SpliceDirective.*;
-
 public final class SplicingIterable<A> implements Iterable<A> {
 
     private final ImmutableQueue<SpliceDirective<A>> segments;
@@ -21,27 +19,26 @@ public final class SplicingIterable<A> implements Iterable<A> {
 
     public SplicingIterable<A> concat(Iterable<A> other) {
         if (other instanceof SplicingIterable<?>) {
-            SplicingIterable<A> other1 = (SplicingIterable<A>) other;
-            return new SplicingIterable<>(segments.concat(other1.segments));
+            return new SplicingIterable<>(segments.concat(((SplicingIterable<A>) other).segments));
         } else {
-            return new SplicingIterable<>(segments.pushBack(splicing(0, 0, other)));
+            return new SplicingIterable<>(segments.pushBack(SpliceDirective.splice(0, 0, other)));
         }
     }
 
     public SplicingIterable<A> take(int n) {
-        return prepend(taking(n));
+        return prepend(SpliceDirective.take(n));
     }
 
     public SplicingIterable<A> drop(int n) {
-        return prepend(dropping(n));
+        return prepend(SpliceDirective.drop(n));
     }
 
     public SplicingIterable<A> splice(int startIndex, int replaceCount, Iterable<A> source) {
-        return prepend(splicing(startIndex, replaceCount, source));
+        return prepend(SpliceDirective.splice(startIndex, replaceCount, source));
     }
 
     private SplicingIterable<A> prepend(SpliceDirective<A> directive) {
-        Maybe<SpliceDirective<A>> spliceDirectiveMaybe = segments.head().flatMap(h -> h.prepend(directive));
+        Maybe<SpliceDirective<A>> spliceDirectiveMaybe = segments.head().flatMap(h -> h.combine(directive));
 
         ImmutableQueue<SpliceDirective<A>> newSegments = spliceDirectiveMaybe
                 .match(__ -> segments.pushFront(directive),
@@ -55,7 +52,7 @@ public final class SplicingIterable<A> implements Iterable<A> {
             return (SplicingIterable<A>) initialSource;
         } else {
             return new SplicingIterable<A>(ImmutableQueue.<SpliceDirective<A>>empty()
-                    .pushFront(splicing(0, 0, initialSource)));
+                    .pushFront(SpliceDirective.splice(0, 0, initialSource)));
         }
     }
 
