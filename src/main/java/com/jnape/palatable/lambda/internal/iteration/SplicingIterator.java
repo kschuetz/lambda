@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static java.lang.Math.min;
-import static java.util.Collections.emptyIterator;
 
 public final class SplicingIterator<A> implements Iterator<A> {
 
@@ -17,8 +16,8 @@ public final class SplicingIterator<A> implements Iterator<A> {
     public SplicingIterator(Iterable<SpliceDirective<A>> sources) {
         Node<A> prev = null;
         for (SpliceDirective<A> source : sources) {
-            Node<A> node = source.match(taking -> new Node<A>(taking.getCount(), -1, emptyIterator()),
-                    dropping -> new Node<>(0, dropping.getCount(), emptyIterator()),
+            Node<A> node = source.match(taking -> new Node<>(taking.getCount(), -1, null),
+                    dropping -> new Node<>(0, dropping.getCount(), null),
                     splicing -> new Node<>(splicing.getStartOffset(), splicing.getReplaceCount(),
                             splicing.getSource().iterator()));
             if (prev == null) {
@@ -61,7 +60,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
         do {
             while (current != null) {
                 if (current.delay == 0) {
-                    if (current.source.hasNext()) {
+                    if (current.haveMoreElements()) {
                         break;
                     }
 
@@ -98,7 +97,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
             }
 
             // current has 0 delay and has next
-            cachedElement = current.source.next();
+            cachedElement = current.nextElement();
 
             current = current.prev;
 
@@ -127,7 +126,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
         }
         Node<A> first = head;
 
-        while (first != null && !first.source.hasNext()) {
+        while (first != null && !first.haveMoreElements()) {
             first = first.next;
         }
 
@@ -137,12 +136,12 @@ public final class SplicingIterator<A> implements Iterator<A> {
 
         int minDelay = first.delay;
         Node<A> current = first.next;
-        while (current != null && current.delay > 0 && current.source.hasNext()) {
+        while (current != null && current.delay > 0 && current.haveMoreElements()) {
             minDelay = min(minDelay, current.delay);
             current = current.next;
         }
         current = first;
-        while (current != null && current.delay > 0 && current.source.hasNext()) {
+        while (current != null && current.delay > 0 && current.haveMoreElements()) {
             current.delay = current.delay - minDelay;
             current = current.next;
         }
@@ -150,7 +149,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
     }
 
     private static final class Node<A> {
-        final Iterator<A> source;
+        private Iterator<A> source;
         int delay;
         int replaceCount;
         Node<A> prev;
@@ -164,10 +163,29 @@ public final class SplicingIterator<A> implements Iterator<A> {
             this.next = null;
         }
 
+        boolean haveMoreElements() {
+            if (source == null) {
+                return false;
+            } else if (source.hasNext()) {
+                return true;
+            } else {
+                source = null;
+                return false;
+            }
+        }
+
+        A nextElement() {
+            A result = source.next();
+            if (!haveMoreElements()) {
+                source = null;
+            }
+            return result;
+        }
+
         @Override
         public String toString() {
             return "[" + delay + ":" + replaceCount + ":" +
-                    (source.hasNext() ? "+" : "_") + "]";
+                    ((source != null && source.hasNext()) ? "+" : "_") + "]";
         }
     }
 
