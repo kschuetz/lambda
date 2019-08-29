@@ -18,6 +18,7 @@ import java.util.List;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Repeat.repeat;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Drop.drop;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Iterate.iterate;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.MagnetizeBy.magnetizeBy;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Take.take;
 import static com.jnape.palatable.lambda.functions.builtin.fn3.FoldRight.foldRight;
 import static com.jnape.palatable.lambda.functions.builtin.fn4.Splice.splice;
@@ -253,8 +254,8 @@ public class SpliceTest {
                 .value();
 
 //        System.out.println(take(1, drop(stackBlowingNumber - 1, ints)).iterator().hasNext());
-            Assert.assertEquals(stackBlowingNumber,
-                    take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
+        Assert.assertEquals(stackBlowingNumber,
+                take(1, drop(stackBlowingNumber - 1, ints)).iterator().next());
     }
 
     @Test
@@ -264,5 +265,15 @@ public class SpliceTest {
 
         Iterable<Integer> result = splice(1, 1, list2, drop(4, list1));
         assertThat(result, iterates(5, 99, 88, 77, 7, 8));
+    }
+
+    @Test
+    public void magnetize1() {
+        int stackBlowingNumber = 10_000;
+        Iterable<Iterable<Integer>> i1 = magnetizeBy((x, y) -> false, take(stackBlowingNumber, repeat(1)));
+        System.out.println(i1.iterator().next());
+        System.out.println("here");
+//        assertThat(last(i1).orElseThrow(AssertionError::new),
+//                iterates(1));
     }
 }

@@ -4,6 +4,8 @@ import com.jnape.palatable.lambda.adt.Maybe;
 
 import java.util.Iterator;
 
+import static java.util.Collections.singleton;
+
 public final class SplicingIterable<A> implements Iterable<A> {
 
     private final ImmutableQueue<SpliceDirective<A>> segments;
@@ -26,18 +28,26 @@ public final class SplicingIterable<A> implements Iterable<A> {
     }
 
     public SplicingIterable<A> take(int n) {
-        return prepend(SpliceDirective.take(n));
+        return addToFront(SpliceDirective.take(n));
     }
 
     public SplicingIterable<A> drop(int n) {
-        return prepend(SpliceDirective.drop(n));
+        return addToFront(SpliceDirective.drop(n));
     }
 
     public SplicingIterable<A> splice(int startIndex, int replaceCount, Iterable<A> source) {
-        return prepend(SpliceDirective.splice(startIndex, replaceCount, source));
+        return addToFront(SpliceDirective.splice(startIndex, replaceCount, source));
     }
 
-    private SplicingIterable<A> prepend(SpliceDirective<A> directive) {
+    public SplicingIterable<A> prepend(A element) {
+        return addToFront(SpliceDirective.splice(0, 0, singleton(element)));
+    }
+
+    public SplicingIterable<A> append(A element) {
+        return addToBack(SpliceDirective.splice(0, 0, singleton(element)));
+    }
+
+    private SplicingIterable<A> addToFront(SpliceDirective<A> directive) {
         Maybe<SpliceDirective<A>> maybeCombined = segments.head().flatMap(h -> h.combine(directive));
 
         ImmutableQueue<SpliceDirective<A>> newSegments = maybeCombined
@@ -45,6 +55,10 @@ public final class SplicingIterable<A> implements Iterable<A> {
                         newDirective -> segments.tail().pushFront(newDirective));
 
         return new SplicingIterable<>(newSegments);
+    }
+
+    private SplicingIterable<A> addToBack(SpliceDirective<A> directive) {
+        return new SplicingIterable<>(segments.pushBack(directive));
     }
 
     public static <A> SplicingIterable<A> splicingIterable(Iterable<A> initialSource) {
