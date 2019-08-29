@@ -2,7 +2,8 @@ package com.jnape.palatable.lambda.functions.builtin.fn2;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
-import com.jnape.palatable.lambda.internal.iteration.SnocIterable;
+
+import static com.jnape.palatable.lambda.internal.iteration.SplicingIterable.splicingIterable;
 
 /**
  * Opposite of {@link Cons}: lazily append an element to the end of the given {@link Iterable}.
@@ -22,7 +23,8 @@ public final class Snoc<A> implements Fn2<A, Iterable<A>, Iterable<A>> {
 
     @Override
     public Iterable<A> checkedApply(A a, Iterable<A> as) {
-        return new SnocIterable<>(a, as);
+//        return new SnocIterable<>(a, as);
+        return splicingIterable(as).append(a);
     }
 
     @SuppressWarnings("unchecked")
