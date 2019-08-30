@@ -2,6 +2,7 @@ package com.jnape.palatable.lambda.functions.builtin.fn4;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.internal.iteration.ConsingIterator;
+import com.jnape.palatable.lambda.internal.iteration.SplicingIterator;
 import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.runners.Traits;
 import org.junit.Assert;
@@ -269,11 +270,12 @@ public class SpliceTest {
 
     @Test
     public void magnetize1() {
-        int stackBlowingNumber = 10_000;
+        int stackBlowingNumber = 400;
         Iterable<Iterable<Integer>> i1 = magnetizeBy((x, y) -> false, take(stackBlowingNumber, repeat(1)));
         System.out.println(i1.iterator().next());
         System.out.println("here");
 //        assertThat(last(i1).orElseThrow(AssertionError::new),
 //                iterates(1));
+        System.out.println("SplicingIterator.count = " + SplicingIterator.count);
     }
 }

@@ -13,13 +13,16 @@ public final class SplicingIterator<A> implements Iterator<A> {
     private A cachedElement;
     private Status status;
 
+    public static int count = 0;
+
     public SplicingIterator(Iterable<SpliceDirective<A>> sources) {
+        count += 1;
         Node<A> prev = null;
         for (SpliceDirective<A> source : sources) {
             Node<A> node = source.match(taking -> new Node<>(taking.getCount(), -1, null),
                     dropping -> new Node<>(0, dropping.getCount(), null),
                     splicing -> new Node<>(splicing.getStartOffset(), splicing.getReplaceCount(),
-                            splicing.getSource().iterator()));
+                            splicing.getSource()));
             if (prev == null) {
                 this.head = node;
             } else {
@@ -149,35 +152,44 @@ public final class SplicingIterator<A> implements Iterator<A> {
     }
 
     private static final class Node<A> {
-        private Iterator<A> source;
+        private Iterable<A> source;
+        private Iterator<A> iterator;
         int delay;
         int replaceCount;
         Node<A> prev;
         Node<A> next;
 
-        Node(int delay, int replaceCount, Iterator<A> source) {
+        Node(int delay, int replaceCount, Iterable<A> source) {
             this.delay = delay;
             this.replaceCount = replaceCount;
             this.source = source;
+            this.iterator = null;
             this.prev = null;
             this.next = null;
         }
 
         boolean haveMoreElements() {
-            if (source == null) {
-                return false;
-            } else if (source.hasNext()) {
+            if (iterator == null) {
+                if (source == null) {
+                    return false;
+                } else {
+                    iterator = source.iterator();
+                    source = null;
+                }
+            }
+
+            if (iterator.hasNext()) {
                 return true;
             } else {
-                source = null;
+                iterator = null;
                 return false;
             }
         }
 
         A nextElement() {
-            A result = source.next();
-            if (!haveMoreElements()) {
-                source = null;
+            A result = iterator.next();
+            if (!iterator.hasNext()) {
+                iterator = null;
             }
             return result;
         }
@@ -185,7 +197,7 @@ public final class SplicingIterator<A> implements Iterator<A> {
         @Override
         public String toString() {
             return "[" + delay + ":" + replaceCount + ":" +
-                    ((source != null && source.hasNext()) ? "+" : "_") + "]";
+                    ((iterator != null && iterator.hasNext()) ? "+" : "_") + "]";
         }
     }
 
