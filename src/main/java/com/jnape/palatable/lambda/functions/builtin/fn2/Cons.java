@@ -19,7 +19,6 @@ public final class Cons<A> implements Fn2<A, Iterable<A>, Iterable<A>> {
     @Override
     public Iterable<A> checkedApply(A a, Iterable<A> as) {
         return () -> new ConsingIterator<>(a, as);
-//        return splicingIterable(as).prepend(a);
     }
 
     @SuppressWarnings("unchecked")
