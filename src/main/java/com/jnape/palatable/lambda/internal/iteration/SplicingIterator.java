@@ -13,16 +13,11 @@ public final class SplicingIterator<A> implements Iterator<A> {
     private A cachedElement;
     private Status status;
 
-    public static int count = 0;
-
-    public SplicingIterator(Iterable<SpliceDirective<A>> sources) {
-        count += 1;
+    public SplicingIterator(Iterable<SpliceSegment<A>> sources) {
         Node<A> prev = null;
-        for (SpliceDirective<A> source : sources) {
-            Node<A> node = source.match(taking -> new Node<>(taking.getCount(), -1, null),
-                    dropping -> new Node<>(0, dropping.getCount(), null),
-                    splicing -> new Node<>(splicing.getStartOffset(), splicing.getReplaceCount(),
-                            splicing.getSource()));
+        for (SpliceSegment<A> source : sources) {
+            Node<A> node = new Node<>(source.getStartOffset(), source.getReplaceCount(),
+                    source.getSource());
             if (prev == null) {
                 this.head = node;
             } else {

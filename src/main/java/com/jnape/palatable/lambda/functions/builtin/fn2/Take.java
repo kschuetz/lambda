@@ -2,8 +2,7 @@ package com.jnape.palatable.lambda.functions.builtin.fn2;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
-
-import static com.jnape.palatable.lambda.internal.iteration.SplicingIterable.splicingIterable;
+import com.jnape.palatable.lambda.internal.iteration.TakingIterable;
 
 /**
  * Lazily limit the <code>Iterable</code> to <code>n</code> elements by returning an <code>Iterable</code> that stops
@@ -23,8 +22,7 @@ public final class Take<A> implements Fn2<Integer, Iterable<A>, Iterable<A>> {
 
     @Override
     public Iterable<A> checkedApply(Integer n, Iterable<A> as) {
-//        return new TakingIterable<>(n, as);
-        return splicingIterable(as).take(n);
+        return new TakingIterable<>(n, as);
     }
 
     @SuppressWarnings("unchecked")

@@ -1,13 +1,13 @@
 package com.jnape.palatable.lambda.monoid.builtin;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.internal.iteration.ConcatenatingIterable;
 import com.jnape.palatable.lambda.monoid.Monoid;
 
 import java.util.Collections;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Flatten.flatten;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Map.map;
-import static com.jnape.palatable.lambda.internal.iteration.SplicingIterable.splicingIterable;
 
 /**
  * The {@link Monoid} instance formed under concatenation for an arbitrary {@link Iterable}.
@@ -28,8 +28,7 @@ public final class Concat<A> implements Monoid<Iterable<A>> {
 
     @Override
     public Iterable<A> checkedApply(Iterable<A> xs, Iterable<A> ys) {
-        return splicingIterable(xs).concat(ys);
-//        return new ConcatenatingIterable<>(xs, ys);
+        return new ConcatenatingIterable<>(xs, ys);
     }
 
     @Override
